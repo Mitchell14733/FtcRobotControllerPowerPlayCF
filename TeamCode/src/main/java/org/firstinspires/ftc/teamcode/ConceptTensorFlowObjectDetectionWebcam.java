@@ -27,19 +27,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
+
+import static android.os.Environment.getExternalStorageDirectory;
 
 import android.annotation.SuppressLint;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import java.util.List;
+
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
 
 /**
  * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -51,7 +54,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
+@TeleOp(name = "TFOD Webcam", group = "Concept")
 //@Disabled
 public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 
@@ -62,10 +65,10 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
      * Here we assume it's an Asset.    Also see method initTfod() below .
      */
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
+//    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
      @SuppressLint("SdCardPath")
-     private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
-
+     private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/PowerPlay.tflite";
+//This PC\Control Hub v1.0\Internal shared storage\FIRST\tflitemodels\model_unquant.tflite
 
     private static final String[] LABELS = {
             "1 Bolt",
@@ -86,7 +89,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      * and paste it in to your code on the next line, between the double quotes.
      */
     private static final String VUFORIA_KEY =
-            "";
+            "ARa/HK7/////AAABmXpBNFK/aUrwpbI9dtfFbSBEOFpnba9Nlg69DUvcWUthANtekaMhFHQUH9yB/8SyfQPLAL4+pQPpT3nMNOA7qJUkVcFInAWfO8WRdTAU+HldRejwWDKCL0iYL/+05RaQHHVrftpcFlbqc6bNjlYOh6SPNpcUZMg1XtMzM2pT66M6Rj9IHNq6KmJmIJkJZwyU+VtHPgZpoRYYY0M9lHxyekOF0DWPjLX6TGW7etq6DrKpBqIzjue9DIwcq7+2Kj9A4E7JOz/LEY+71PYRy8nnnF0VkZZP8n2hY38wsUBBVmtnSdZrkwtVcjdI6Md2oHGF5zimTR+8hsTtprTyO+i+/R4JHC4Ic+DpkGaCfnzuZNMY";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -120,7 +123,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
             // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
             // should be set to the value of the images used to create the TensorFlow Object Detection model
             // (typically 16/9).
-            tfod.setZoom(1.0, 16.0/9.0);
+            tfod.setZoom(2.0, 16.0/9.0);
         }
 
         /** Wait for the game to begin */
@@ -187,7 +190,7 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
 
         // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+//        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
+         tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 }
