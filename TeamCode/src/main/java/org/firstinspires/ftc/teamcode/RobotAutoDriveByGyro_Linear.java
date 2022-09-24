@@ -94,9 +94,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DcMotor         leftDrive   = null;
-    private DcMotor         rightDrive  = null;
+    private DcMotor left_front = null;
+    private DcMotor right_front = null;
+    private DcMotor right_rear = null;
+    private DcMotor left_rear = null;
     private BNO055IMU       imu         = null;      // Control/Expansion Hub IMU
+
+    private double left_front_power;
+    private double right_front_power;
+    private double left_rear_power;
+    private double right_rear_power;
 
     private double          robotHeading  = 0;
     private double          headingOffset = 0;
@@ -109,8 +116,10 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     private double  turnSpeed     = 0;
     private double  leftSpeed     = 0;
     private double  rightSpeed    = 0;
-    private int     leftTarget    = 0;
-    private int     rightTarget   = 0;
+    private int     leftFrontTarget    = 0;
+    private int     leftRearTarget   = 0;
+    private int     rightFrontTarget    = 0;
+    private int     rightRearTarget   = 0;
 
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
@@ -118,9 +127,9 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     // For example, use a value of 2.0 for a 12-tooth spur gear driving a 24-tooth spur gear.
     // This is gearing DOWN for less speed and more torque.
     // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
-    static final double     COUNTS_PER_MOTOR_REV    = 537.7 ;   // eg: GoBILDA 312 RPM Yellow Jacket
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // No External Gearing.
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_MOTOR_REV    = 28.0 ;   // eg: GoBILDA 312 RPM Yellow Jacket
+    static final double     DRIVE_GEAR_REDUCTION    = 20.0 ;     // No External Gearing.
+    static final double     WHEEL_DIAMETER_INCHES   = 3.78 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
 
@@ -142,14 +151,18 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     public void runOpMode() {
 
         // Initialize the drive system variables.
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        left_front = hardwareMap.get(DcMotor.class, "left_front");
+        right_front = hardwareMap.get(DcMotor.class, "right_front");
+        left_rear = hardwareMap.get(DcMotor.class, "left_rear");
+        right_rear = hardwareMap.get(DcMotor.class, "right_rear");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        leftDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        left_front.setDirection(DcMotor.Direction.FORWARD);
+        left_rear.setDirection(DcMotor.Direction.FORWARD);
+        right_front.setDirection(DcMotor.Direction.REVERSE);
+        right_rear.setDirection(DcMotor.Direction.REVERSE);
 
         // define initialization values for IMU, and then initialize it.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -158,10 +171,15 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
         imu.initialize(parameters);
 
         // Ensure the robot is stationary.  Reset the encoders and set the motors to BRAKE mode
-        leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        left_rear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right_rear.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        left_rear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right_rear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
@@ -170,8 +188,11 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
         }
 
         // Set the encoders for closed loop speed control, and reset the heading.
-        leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        right_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         resetHeading();
 
         // Step through each leg of the path,
@@ -228,24 +249,30 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
 
             // Determine new target position, and pass to motor controller
             int moveCounts = (int)(distance * COUNTS_PER_INCH);
-            leftTarget = leftDrive.getCurrentPosition() + moveCounts;
-            rightTarget = rightDrive.getCurrentPosition() + moveCounts;
+            leftFrontTarget = left_front.getCurrentPosition() + moveCounts;
+            leftRearTarget = left_rear.getCurrentPosition() + moveCounts;
+            rightFrontTarget = right_front.getCurrentPosition() + moveCounts;
+            rightRearTarget = right_rear.getCurrentPosition() + moveCounts;
 
             // Set Target FIRST, then turn on RUN_TO_POSITION
-            leftDrive.setTargetPosition(leftTarget);
-            rightDrive.setTargetPosition(rightTarget);
+            left_front.setTargetPosition(leftFrontTarget);
+            left_rear.setTargetPosition(leftRearTarget);
+            right_front.setTargetPosition(rightFrontTarget);
+            right_rear.setTargetPosition(rightRearTarget);
 
-            leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            left_front.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            left_rear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            right_front.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            right_rear.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Set the required driving speed  (must be positive for RUN_TO_POSITION)
             // Start driving straight, and then enter the control loop
             maxDriveSpeed = Math.abs(maxDriveSpeed);
             moveRobot(maxDriveSpeed, 0);
 
-            // keep looping while we are still active, and BOTH motors are running.
+            // keep looping while we are still active, and ALL motors are running.
             while (opModeIsActive() &&
-                   (leftDrive.isBusy() && rightDrive.isBusy())) {
+                   (left_front.isBusy() && right_front.isBusy() && left_rear.isBusy() && right_rear.isBusy())) {
 
                 // Determine required steering to keep on heading
                 turnSpeed = getSteeringCorrection(heading, P_DRIVE_GAIN);
@@ -263,8 +290,10 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
 
             // Stop all motion & Turn off RUN_TO_POSITION
             moveRobot(0, 0);
-            leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            left_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            right_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
 
@@ -386,8 +415,10 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
             rightSpeed /= max;
         }
 
-        leftDrive.setPower(leftSpeed);
-        rightDrive.setPower(rightSpeed);
+        left_front.setPower(leftSpeed);
+        left_rear.setPower(leftSpeed);
+        right_front.setPower(rightSpeed);
+        right_rear.setPower(rightSpeed);
     }
 
     /**
@@ -399,9 +430,9 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
 
         if (straight) {
             telemetry.addData("Motion", "Drive Straight");
-            telemetry.addData("Target Pos L:R",  "%7d:%7d",      leftTarget,  rightTarget);
-            telemetry.addData("Actual Pos L:R",  "%7d:%7d",      leftDrive.getCurrentPosition(),
-                    rightDrive.getCurrentPosition());
+            telemetry.addData("Target Pos L:R",  "%7d:%7d",      leftFrontTarget,  rightFrontTarget);
+            telemetry.addData("Actual Pos L:R",  "%7d:%7d",      left_front.getCurrentPosition(),
+                    right_front.getCurrentPosition());
         } else {
             telemetry.addData("Motion", "Turning");
         }
