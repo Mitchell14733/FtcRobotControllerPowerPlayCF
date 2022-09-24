@@ -130,10 +130,10 @@ public class TeleOp2 extends LinearOpMode {
             right_rear_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
             left_front_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
             left_rear_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
-            right_front.setPower(right_front_power);
-            left_front.setPower(left_front_power);
-            right_rear.setPower(right_rear_power);
-            left_rear.setPower(left_rear_power);
+            right_front.setPower(right_front_power *.75);
+            left_front.setPower(left_front_power *.75);
+            right_rear.setPower(right_rear_power *.75);
+            left_rear.setPower(left_rear_power *.75);
             telemetry.update();
 
 
