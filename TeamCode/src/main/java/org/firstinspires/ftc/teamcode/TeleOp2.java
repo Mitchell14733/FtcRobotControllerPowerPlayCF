@@ -33,6 +33,7 @@ public class TeleOp2 extends LinearOpMode {
     private DcMotor right_front = null;
     private DcMotor right_rear = null;
     private DcMotor left_rear = null;
+    private DcMotor slide_motor = null;
 
     private double left_front_power;
     private double right_front_power;
@@ -72,6 +73,7 @@ public class TeleOp2 extends LinearOpMode {
         right_front = hardwareMap.get(DcMotor.class, "right_front");
         left_rear = hardwareMap.get(DcMotor.class, "left_rear");
         right_rear = hardwareMap.get(DcMotor.class, "right_rear");
+        slide_motor = hardwareMap.get(DcMotor.class, "slide_motor");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -79,12 +81,19 @@ public class TeleOp2 extends LinearOpMode {
         right_front.setDirection(DcMotor.Direction.FORWARD);
         left_rear.setDirection(DcMotor.Direction.REVERSE);
         right_rear.setDirection(DcMotor.Direction.FORWARD);
+        slide_motor.setDirection(DcMotor.Direction.FORWARD);
+
+        slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+
+
 
             /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -102,11 +111,13 @@ public class TeleOp2 extends LinearOpMode {
             telemetry.addData("RR POWER", ("%.3f"), right_rear_power);
             telemetry.addData("LF POWER", ("%.3f"), left_front_power);
             telemetry.addData("LR POWER", ("%.3f"), left_rear_power);
+            telemetry.addData("Slide", ("%.3f"), slide_motor.getCurrentPosition());
 
             driveTurn = -gamepad1.left_stick_x;
             gamepadXCoordinate = gamepad1.right_stick_x; //this simply gives our x value relative to the driver
             gamepadYCoordinate = -gamepad1.right_stick_y; //this simply gives our y value relative to the driver
             gamepadHypot = Range.clip(Math.hypot(gamepadXCoordinate, gamepadYCoordinate), 0, 1);
+
             //finds just how much power to give the robot based on how much x and y given by gamepad
             //range.clip helps us keep our power within positive 1
             // also helps set maximum possible value of 1/sqrt(2) for x and y controls if at a 45 degree angle (which yields greatest possible value for y+x)
@@ -134,8 +145,18 @@ public class TeleOp2 extends LinearOpMode {
             left_front.setPower(left_front_power *.75);
             right_rear.setPower(right_rear_power *.75);
             left_rear.setPower(left_rear_power *.75);
-            telemetry.update();
 
+            while(gamepad2.dpad_down)
+            {
+                slide_motor.setTargetPosition(slide_motor.getCurrentPosition() - 20);
+            }
+
+            while(gamepad2.dpad_up)
+            {
+                slide_motor.setTargetPosition(slide_motor.getCurrentPosition() + 20);
+            }
+            telemetry.update();
+            slide_motor.setPower(0);
 
         }
     }
