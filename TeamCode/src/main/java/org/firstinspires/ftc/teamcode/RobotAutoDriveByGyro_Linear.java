@@ -33,6 +33,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -94,32 +95,32 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DcMotor left_front = null;
+    private DcMotor left_front  = null;
     private DcMotor right_front = null;
-    private DcMotor right_rear = null;
-    private DcMotor left_rear = null;
-    private BNO055IMU       imu         = null;      // Control/Expansion Hub IMU
+    private DcMotor right_rear  = null;
+    private DcMotor left_rear   = null;
+    private BNO055IMU imu       = null;      // Control/Expansion Hub IMU
 
     private double left_front_power;
     private double right_front_power;
     private double left_rear_power;
     private double right_rear_power;
 
-    private double          robotHeading  = 0;
-    private double          headingOffset = 0;
-    private double          headingError  = 0;
+    private double robotHeading  = 0;
+    private double headingOffset = 0;
+    private double headingError  = 0;
 
     // These variable are declared here (as class members) so they can be updated in various methods,
     // but still be displayed by sendTelemetry()
-    private double  targetHeading = 0;
-    private double  driveSpeed    = 0;
-    private double  turnSpeed     = 0;
-    private double  leftSpeed     = 0;
-    private double  rightSpeed    = 0;
-    private int     leftFrontTarget    = 0;
-    private int     leftRearTarget   = 0;
+    private double  targetHeading       = 0;
+    private double  driveSpeed          = 0;
+    private double  turnSpeed           = 0;
+    private double  leftSpeed           = 0;
+    private double  rightSpeed          = 0;
+    private int     leftFrontTarget     = 0;
+    private int     leftRearTarget      = 0;
     private int     rightFrontTarget    = 0;
-    private int     rightRearTarget   = 0;
+    private int     rightRearTarget     = 0;
 
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
@@ -136,12 +137,12 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
     static final double     DRIVE_SPEED             = 0.4;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = 0.2;     // Max Turn speed to limit turn rate
+    static final double     TURN_SPEED              = 1.0;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
                                                                // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
     // We define one value when Turning (larger errors), and the other is used when Driving straight (smaller errors).
-    // Increase these numbers if the heading does not corrects strongly enough (eg: a heavy robot or using tracks)
+    // Increase these numbers if the heading does not correct strongly enough (eg: a heavy robot or using tracks)
     // Decrease these numbers if the heading does not settle on the correct value (eg: very agile robot with omni wheels)
     static final double     P_TURN_GAIN            = 0.02;     // Larger is more responsive, but also less stable
     static final double     P_DRIVE_GAIN           = 0.03;     // Larger is more responsive, but also less stable
@@ -200,18 +201,18 @@ public class RobotAutoDriveByGyro_Linear extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
-        turnToHeading( TURN_SPEED, -45.0);               // Turn  CW to -45 Degrees
+//        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
+        turnToHeading( TURN_SPEED, getRawHeading() - 180);               // Turn  CW to -45 Degrees
         holdHeading( TURN_SPEED, -45.0, 0.5);   // Hold -45 Deg heading for a 1/2 second
-
+//
         driveStraight(DRIVE_SPEED, 17.0, -45.0);  // Drive Forward 17" at -45 degrees (12"x and 12"y)
-        turnToHeading( TURN_SPEED,  45.0);               // Turn  CCW  to  45 Degrees
-        holdHeading( TURN_SPEED,  45.0, 0.5);    // Hold  45 Deg heading for a 1/2 second
-
-        driveStraight(DRIVE_SPEED, 17.0, 45.0);  // Drive Forward 17" at 45 degrees (-12"x and 12"y)
+        turnToHeading( TURN_SPEED,  160.0);               // Turn  CCW  to  45 Degrees
+        holdHeading( TURN_SPEED,  160.0, 0.5);    // Hold  45 Deg heading for a 1/2 second
+//
+        driveStraight(DRIVE_SPEED, 40.0, 160.0);  // Drive Forward 17" at 45 degrees (-12"x and 12"y)
         turnToHeading( TURN_SPEED,   0.0);               // Turn  CW  to 0 Degrees
         holdHeading( TURN_SPEED,   0.0, 1.0);    // Hold  0 Deg heading for 1 second
-
+//
         driveStraight(DRIVE_SPEED,-48.0, 0.0);    // Drive in Reverse 48" (should return to approx. staring position)
 
         telemetry.addData("Path", "Complete");
