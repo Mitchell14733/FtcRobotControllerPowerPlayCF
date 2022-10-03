@@ -61,11 +61,11 @@ public class TeleOp2 extends LinearOpMode {
 //        telemetry.addData("Status", "Initialized");
         telemetry.update();
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile  = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled       = true;
-        parameters.loggingTag           = "IMU";
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "IMU";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port.
@@ -75,17 +75,17 @@ public class TeleOp2 extends LinearOpMode {
         double driveTurn;
         double gamepadXCoordinate;
         double gamepadYCoordinate;
-        double gamepadHypot     = 0;
-        double gamepadRadians   = 0;
-        double robotRadians     = 0;
-        double movementRadians  = 0;
-        double gamepadXControl  = 0;
-        double gamepadYControl  = 0;
+        double gamepadHypot = 0;
+        double gamepadRadians = 0;
+        double robotRadians = 0;
+        double movementRadians = 0;
+        double gamepadXControl = 0;
+        double gamepadYControl = 0;
 
-        left_front  = hardwareMap.get(DcMotor.class, "left_front");
+        left_front = hardwareMap.get(DcMotor.class, "left_front");
         right_front = hardwareMap.get(DcMotor.class, "right_front");
-        left_rear   = hardwareMap.get(DcMotor.class, "left_rear");
-        right_rear  = hardwareMap.get(DcMotor.class, "right_rear");
+        left_rear = hardwareMap.get(DcMotor.class, "left_rear");
+        right_rear = hardwareMap.get(DcMotor.class, "right_rear");
         slide_motor = hardwareMap.get(DcMotor.class, "slide_motor");
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -168,7 +168,7 @@ public class TeleOp2 extends LinearOpMode {
             //Reset Heading
 //            while (gamepad1.left_bumper) {
 //                resetHeading();
-            }
+
 
             //Gamepad 2
             int slideTopPosition = 600;
@@ -180,24 +180,28 @@ public class TeleOp2 extends LinearOpMode {
             while (gamepad2.dpad_up) {
                 slide_motor.setPower(0.5);
                 slide_motor.setTargetPosition(slideTopPosition);
+                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
             //Move linear slide to middle position
             while (gamepad2.dpad_left) {
                 slide_motor.setPower(0.5);
                 slide_motor.setTargetPosition(slideMiddlePosition);
+                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
             //Move linear slide to low position
             while (gamepad2.dpad_right) {
                 slide_motor.setPower(0.5);
                 slide_motor.setTargetPosition(slideLowPosition);
+                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
             //Move linear slide to bottom position
             while (gamepad2.dpad_down) {
                 slide_motor.setPower(0.5);
                 slide_motor.setTargetPosition(slideBottomPosition);
+                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
 
             //Run linear slide manually
@@ -212,95 +216,94 @@ public class TeleOp2 extends LinearOpMode {
             //Drop cone
 
 
-
             telemetry.update();
             slide_motor.setPower(0);
+        } //While op mode is active
+    } //Run OP Mode
+
+        //Constants and functions for adding automatic steering controls
+        static final double COUNTS_PER_MOTOR_REV = 28.0;   // Rev Ultraplanetary HD Hex motor: 28.0
+        static final double DRIVE_GEAR_REDUCTION = 20.0;     // External Gear Ratio
+        static final double WHEEL_DIAMETER_INCHES = 3.78;     // 96mm Mech Wheels, For figuring circumference
+        static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+                (WHEEL_DIAMETER_INCHES * 3.1415);
+
+        // These constants define the desired driving/control characteristics
+        // They can/should be tweaked to suit the specific robot drive train.
+        static final double DRIVE_SPEED = 0.4;     // Max driving speed for better distance accuracy.
+        static final double TURN_SPEED = 1.0;     // Max Turn speed to limit turn rate
+        static final double HEADING_THRESHOLD = 1.0;    // How close must the heading get to the target before moving to next step.
+        // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
+        // Define the Proportional control coefficient (or GAIN) for "heading control".
+        // We define one value when Turning (larger errors), and the other is used when Driving straight (smaller errors).
+        // Increase these numbers if the heading does not correct strongly enough (eg: a heavy robot or using tracks)
+        // Decrease these numbers if the heading does not settle on the correct value (eg: very agile robot with omni wheels)
+        static final double P_TURN_GAIN = 0.02;     // Larger is more responsive, but also less stable
+        static final double P_DRIVE_GAIN = 0.03;     // Larger is more responsive, but also less stable
+
+        public void turnToHeading ( double maxTurnSpeed, double heading){
+
+            // Run getSteeringCorrection() once to pre-calculate the current error
+            getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+            // keep looping while we are still active, and not on heading.
+            while (opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
+
+                // Determine required steering to keep on heading
+                turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
+
+                // Clip the speed to the maximum permitted value.
+                turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
+
+                // Pivot in place by applying the turning correction
+                moveRobot(0, turnSpeed);
+
+            }
         }
 
-
-    //Constants and functions for adding automatic steering controls
-    static final double COUNTS_PER_MOTOR_REV = 28.0;   // Rev Ultraplanetary HD Hex motor: 28.0
-    static final double DRIVE_GEAR_REDUCTION = 20.0;     // External Gear Ratio
-    static final double WHEEL_DIAMETER_INCHES = 3.78;     // 96mm Mech Wheels, For figuring circumference
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-
-    // These constants define the desired driving/control characteristics
-    // They can/should be tweaked to suit the specific robot drive train.
-    static final double DRIVE_SPEED = 0.4;     // Max driving speed for better distance accuracy.
-    static final double TURN_SPEED = 1.0;     // Max Turn speed to limit turn rate
-    static final double HEADING_THRESHOLD = 1.0;    // How close must the heading get to the target before moving to next step.
-    // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
-    // Define the Proportional control coefficient (or GAIN) for "heading control".
-    // We define one value when Turning (larger errors), and the other is used when Driving straight (smaller errors).
-    // Increase these numbers if the heading does not correct strongly enough (eg: a heavy robot or using tracks)
-    // Decrease these numbers if the heading does not settle on the correct value (eg: very agile robot with omni wheels)
-    static final double P_TURN_GAIN = 0.02;     // Larger is more responsive, but also less stable
-    static final double P_DRIVE_GAIN = 0.03;     // Larger is more responsive, but also less stable
-
-    public void turnToHeading(double maxTurnSpeed, double heading) {
-
-        // Run getSteeringCorrection() once to pre-calculate the current error
-        getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-        // keep looping while we are still active, and not on heading.
-        while (opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
-
-            // Determine required steering to keep on heading
-            turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
-
-            // Clip the speed to the maximum permitted value.
-            turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
-
-            // Pivot in place by applying the turning correction
-            moveRobot(0, turnSpeed);
-
-        }
-    }
-
-     /**
-     * Reset the "offset" heading back to zero
-     */
-    public void resetHeading() {
-        // Save a new heading offset equal to the current raw heading.
-        headingOffset = angles.firstAngle;
-        robotHeading = 0;
-    }
-
-    public double getSteeringCorrection(double desiredHeading, double proportionalGain) {
-        targetHeading = desiredHeading;  // Save for telemetry
-
-        // Get the robot heading by applying an offset to the IMU heading
-        robotHeading = angles.firstAngle - headingOffset;
-
-        // Determine the heading current error
-        headingError = targetHeading - robotHeading;
-
-        // Normalize the error to be within +/- 180 degrees
-        while (headingError > 180) headingError -= 360;
-        while (headingError <= -180) headingError += 360;
-
-        // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
-        return Range.clip(headingError * proportionalGain, -1, 1);
-    }
-
-    public void moveRobot(double drive, double turn) {
-        driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
-        turnSpeed = turn;      // save this value as a class member so it can be used by telemetry.
-
-        leftSpeed = drive - turn;
-        rightSpeed = drive + turn;
-
-        // Scale speeds down if either one exceeds +/- 1.0;
-        double max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
-        if (max > 1.0) {
-            leftSpeed /= max;
-            rightSpeed /= max;
+        /**
+         * Reset the "offset" heading back to zero
+         */
+        public void resetHeading () {
+            // Save a new heading offset equal to the current raw heading.
+            headingOffset = angles.firstAngle;
+            robotHeading = 0;
         }
 
-        left_front.setPower(leftSpeed);
-        left_rear.setPower(leftSpeed);
-        right_front.setPower(rightSpeed);
-        right_rear.setPower(rightSpeed);
-    }
+        public double getSteeringCorrection ( double desiredHeading, double proportionalGain){
+            targetHeading = desiredHeading;  // Save for telemetry
+
+            // Get the robot heading by applying an offset to the IMU heading
+            robotHeading = angles.firstAngle - headingOffset;
+
+            // Determine the heading current error
+            headingError = targetHeading - robotHeading;
+
+            // Normalize the error to be within +/- 180 degrees
+            while (headingError > 180) headingError -= 360;
+            while (headingError <= -180) headingError += 360;
+
+            // Multiply the error by the gain to determine the required steering correction/  Limit the result to +/- 1.0
+            return Range.clip(headingError * proportionalGain, -1, 1);
+        }
+
+        public void moveRobot ( double drive, double turn){
+            driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
+            turnSpeed = turn;      // save this value as a class member so it can be used by telemetry.
+
+            leftSpeed = drive - turn;
+            rightSpeed = drive + turn;
+
+            // Scale speeds down if either one exceeds +/- 1.0;
+            double max = Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed));
+            if (max > 1.0) {
+                leftSpeed /= max;
+                rightSpeed /= max;
+            }
+
+            left_front.setPower(leftSpeed);
+            left_rear.setPower(leftSpeed);
+            right_front.setPower(rightSpeed);
+            right_rear.setPower(rightSpeed);
+        }
 }
