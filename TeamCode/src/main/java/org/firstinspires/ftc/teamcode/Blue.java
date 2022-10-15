@@ -142,8 +142,8 @@ public class Blue extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = 0.1;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = 1.0;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -331,24 +331,34 @@ public class Blue extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-        if(tagOfInterest == null || tagOfInterest.id == LEFT) {
-            driveStraight(DRIVE_SPEED, 35.0, 0);
-            turnToHeading(TURN_SPEED,  90);
-            holdHeading(TURN_SPEED,  90, 0.5);
-            driveStraight(DRIVE_SPEED, 22, 90);
-        }
 
+
+        driveStraight(DRIVE_SPEED, 63, 0);
+// loop when time is found
+        turnToHeading(TURN_SPEED,  45);
+        holdHeading(TURN_SPEED,  45, 0.5);
+        driveStraight(DRIVE_SPEED, 10, 45);
+        driveStraight(DRIVE_SPEED, -10, 45);
+        turnToHeading(TURN_SPEED,  -90);
+        holdHeading(TURN_SPEED,  -90, 0.5);
+        driveStraight(DRIVE_SPEED, 30, -90);
+        driveStraight(DRIVE_SPEED, -30, -90);
+// loop when time is found
+
+        turnToHeading(TURN_SPEED,  90);
+        holdHeading(TURN_SPEED,  90, 0.5);
+
+        if(tagOfInterest.id == LEFT) {
+            //Drive to Left
+            driveStraight(DRIVE_SPEED, 30, 90);
+        }
         else if(tagOfInterest.id == MIDDLE) {
-            //Drive to Middle
+        // Drive to middle, needed because there need to be this or it will never run middle
 
         }
-
         else {
-            //Drive to right
-
+        driveStraight(DRIVE_SPEED, -30, 90);
         }
-
-
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
 
