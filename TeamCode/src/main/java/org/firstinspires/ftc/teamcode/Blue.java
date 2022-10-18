@@ -39,6 +39,8 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -105,7 +107,10 @@ public class Blue extends LinearOpMode {
     private DcMotor right_front = null;
     private DcMotor right_rear  = null;
     private DcMotor left_rear   = null;
+    private DcMotor slide_motor = null;
     private BNO055IMU imu       = null;      // Control/Expansion Hub IMU
+    private Servo Back          = null;
+    private Servo Front         = null;
 
     private double left_front_power;
     private double right_front_power;
@@ -173,6 +178,10 @@ public class Blue extends LinearOpMode {
     int LEFT    = 35; // Tag ID from the 36h11 family
     int MIDDLE  = 36;
     int RIGHT   = 37;
+    int slideTopPosition = 3400;
+    int slideMiddlePosition = 2400;
+    int slideLowPosition = 1400;
+    int slideBottomPosition = 50;
 
     AprilTagDetection tagOfInterest = null;
 
@@ -187,11 +196,15 @@ public class Blue extends LinearOpMode {
         right_front = hardwareMap.get(DcMotor.class, "right_front");
         left_rear = hardwareMap.get(DcMotor.class, "left_rear");
         right_rear = hardwareMap.get(DcMotor.class, "right_rear");
+        slide_motor = hardwareMap.get(DcMotor.class, "slide_motor");
+        Back = hardwareMap.get(Servo.class, "Back");
+        Front = hardwareMap.get(Servo.class, "Front");
 
-        left_front.setDirection(DcMotor.Direction.FORWARD);
-        left_rear.setDirection(DcMotor.Direction.FORWARD);
-        right_front.setDirection(DcMotor.Direction.REVERSE);
-        right_rear.setDirection(DcMotor.Direction.REVERSE);
+        left_front.setDirection(DcMotor.Direction.REVERSE);
+        left_rear.setDirection(DcMotor.Direction.REVERSE);
+        right_front.setDirection(DcMotor.Direction.FORWARD);
+        right_rear.setDirection(DcMotor.Direction.FORWARD);
+        slide_motor.setDirection(DcMotor.Direction.FORWARD);
 
         // Ensure the robot is stationary.  Reset the encoders and set the motors to BRAKE mode
         left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -209,6 +222,11 @@ public class Blue extends LinearOpMode {
         right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         left_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide_motor.setTargetPosition(0);
+        slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // define initialization values for IMU, and then initialize it.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -331,18 +349,43 @@ public class Blue extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
+        slide_motor.setPower(0.75);
 
-
-        driveStraight(DRIVE_SPEED, 63, 0);
+        driveStraight(DRIVE_SPEED, 70, 0);
+        driveStraight(DRIVE_SPEED, -7, 0);
 // loop when time is found
-        turnToHeading(TURN_SPEED,  45);
-        holdHeading(TURN_SPEED,  45, 0.5);
-        driveStraight(DRIVE_SPEED, 10, 45);
+        turnToHeading(TURN_SPEED,  43);
+        holdHeading(TURN_SPEED,  43, 0.5);
+        slide_motor.setTargetPosition(slideTopPosition);
+        sleep(2500);
+        driveStraight(DRIVE_SPEED, 12.5, 43);
+        Back.setPosition(0);
+        Front.setPosition(1);
+        sleep(2000);
+        driveStraight(DRIVE_SPEED, -10, 43);
+        slide_motor.setTargetPosition(900);
+        sleep(2000);
+        turnToHeading(TURN_SPEED,  -85);
+        holdHeading(TURN_SPEED,  -85, 0.5);
+        driveStraight(DRIVE_SPEED, 36, -85);
+        Back.setPosition(1);
+        Front.setPosition(0);
+        slide_motor.setTargetPosition(450);
+        sleep(2000);
+        Back.setPosition(.5);
+        Front.setPosition(.5);
+        slide_motor.setTargetPosition(slideTopPosition);
+        sleep(2500);
+        driveStraight(DRIVE_SPEED, -30, -85);
+        turnToHeading(TURN_SPEED,  43);
+        holdHeading(TURN_SPEED,  43, 0.5);
+        driveStraight(DRIVE_SPEED, 12.5, 43);
+        Back.setPosition(0);
+        Front.setPosition(1);
+        sleep(2000);
         driveStraight(DRIVE_SPEED, -10, 45);
-        turnToHeading(TURN_SPEED,  -90);
-        holdHeading(TURN_SPEED,  -90, 0.5);
-        driveStraight(DRIVE_SPEED, 30, -90);
-        driveStraight(DRIVE_SPEED, -30, -90);
+        slide_motor.setTargetPosition(800);
+        sleep(2000);
 // loop when time is found
 
         turnToHeading(TURN_SPEED,  90);
