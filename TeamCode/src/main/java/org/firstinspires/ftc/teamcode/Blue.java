@@ -48,6 +48,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import java.util.ArrayList;
 
@@ -184,6 +185,7 @@ public class Blue extends LinearOpMode {
     int slideBottomPosition = 50;
 
     AprilTagDetection tagOfInterest = null;
+    DigitalChannel touch;  // Hardware Device Object
 
     @Override
     public void runOpMode() {
@@ -199,11 +201,13 @@ public class Blue extends LinearOpMode {
         slide_motor = hardwareMap.get(DcMotor.class, "slide_motor");
         Back = hardwareMap.get(Servo.class, "Back");
         Front = hardwareMap.get(Servo.class, "Front");
+        touch = hardwareMap.get(DigitalChannel.class, "touch");
+        touch.setMode(DigitalChannel.Mode.INPUT);
 
-        left_front.setDirection(DcMotor.Direction.REVERSE);
-        left_rear.setDirection(DcMotor.Direction.REVERSE);
-        right_front.setDirection(DcMotor.Direction.FORWARD);
-        right_rear.setDirection(DcMotor.Direction.FORWARD);
+        left_front.setDirection(DcMotor.Direction.FORWARD);
+        left_rear.setDirection(DcMotor.Direction.FORWARD);
+        right_front.setDirection(DcMotor.Direction.REVERSE);
+        right_rear.setDirection(DcMotor.Direction.REVERSE);
         slide_motor.setDirection(DcMotor.Direction.FORWARD);
 
         // Ensure the robot is stationary.  Reset the encoders and set the motors to BRAKE mode
@@ -242,6 +246,7 @@ public class Blue extends LinearOpMode {
 
         camera.setPipeline(aprilTagDetectionPipeline);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+
         {
             @Override
             public void onOpened()
@@ -351,61 +356,58 @@ public class Blue extends LinearOpMode {
 
         slide_motor.setPower(0.75);
 
-        driveStraight(DRIVE_SPEED, 70, 0);
+        slide_motor.setTargetPosition(slideMiddlePosition);
+        driveStraight(DRIVE_SPEED, 68, 0);
         driveStraight(DRIVE_SPEED, -7, 0);
-// loop when time is found
-        turnToHeading(TURN_SPEED,  43);
-        holdHeading(TURN_SPEED,  43, 0.5);
-        slide_motor.setTargetPosition(slideTopPosition);
-        sleep(2500);
-        driveStraight(DRIVE_SPEED, 12.5, 43);
-        Back.setPosition(0);
-        Front.setPosition(1);
+        turnToHeading(TURN_SPEED,  142);
+        driveStraight(DRIVE_SPEED, 12.5, 142);
+        Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -10, 43);
+        ServoOff();
+        driveStraight(DRIVE_SPEED, -15, 142);
         slide_motor.setTargetPosition(900);
-        sleep(2000);
-        turnToHeading(TURN_SPEED,  -85);
-        holdHeading(TURN_SPEED,  -85, 0.5);
-        driveStraight(DRIVE_SPEED, 36, -85);
-        Back.setPosition(1);
-        Front.setPosition(0);
-        slide_motor.setTargetPosition(450);
-        sleep(2000);
-        Back.setPosition(.5);
-        Front.setPosition(.5);
-        slide_motor.setTargetPosition(slideTopPosition);
-        sleep(2500);
-        driveStraight(DRIVE_SPEED, -30, -85);
-        turnToHeading(TURN_SPEED,  43);
-        holdHeading(TURN_SPEED,  43, 0.5);
-        driveStraight(DRIVE_SPEED, 12.5, 43);
-        Back.setPosition(0);
-        Front.setPosition(1);
-        sleep(2000);
-        driveStraight(DRIVE_SPEED, -10, 45);
-        slide_motor.setTargetPosition(800);
-        sleep(2000);
-// loop when time is found
+        turnToHeading(TURN_SPEED,  -88);
+        holdHeading(TURN_SPEED,  -88, 0.5);
+        driveStraight(DRIVE_SPEED, 36, -88);
+        while (touch.getState()) {
+            slide_motor.setTargetPosition(450);
+            Intake();
+            telemetry.addData("Digital Touch", "Is Not Pressed");//true
+            telemetry.update();
+        }
+        if (!touch.getState()) {
+            Back.setPosition(.5);
+            Front.setPosition(.5);
+        }
 
-        turnToHeading(TURN_SPEED,  90);
-        holdHeading(TURN_SPEED,  90, 0.5);
+        slide_motor.setTargetPosition(slideMiddlePosition);
+        sleep(1000);
+        driveStraight(DRIVE_SPEED, -30, -88);
+        turnToHeading(TURN_SPEED,  136);
+        holdHeading(TURN_SPEED,  136, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, 136);
+        Output();
+        sleep(2000);
+        driveStraight(DRIVE_SPEED, -17.5, 47);
+       turnToHeading(TURN_SPEED,  120);
+       holdHeading(TURN_SPEED,  120, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
-            driveStraight(DRIVE_SPEED, 30, 90);
+            driveStraight(DRIVE_SPEED, 30, 120);
         }
         else if(tagOfInterest.id == MIDDLE) {
         // Drive to middle, needed because there need to be this or it will never run middle
 
         }
         else {
-        driveStraight(DRIVE_SPEED, -30, 90);
+        driveStraight(DRIVE_SPEED, -30, 120);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
 
         sleep(1000);  // Pause to display last telemetry message.
+
     }
 
 
@@ -609,6 +611,18 @@ public class Blue extends LinearOpMode {
         left_rear.setPower(leftSpeed);
         right_front.setPower(rightSpeed);
         right_rear.setPower(rightSpeed);
+    }
+    public void Intake(){
+        Back.setPosition(0);
+        Front.setPosition(1);
+    }
+    public void Output(){
+        Back.setPosition(1);
+        Front.setPosition(0);
+    }
+    public void ServoOff(){
+        Back.setPosition(.5);
+        Front.setPosition(.5);
     }
 
     /**
