@@ -9,6 +9,8 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -34,7 +36,9 @@ public class TeleOp2 extends LinearOpMode {
     private DcMotor right_rear = null;
     private DcMotor left_rear = null;
     private DcMotor slide_motor = null;
-
+    private Servo Back;
+    private Servo Front;
+    private DigitalChannel touch;
     private double left_front_power;
     private double right_front_power;
     private double left_rear_power;
@@ -55,6 +59,7 @@ public class TeleOp2 extends LinearOpMode {
     private int leftRearTarget = 0;
     private int rightFrontTarget = 0;
     private int rightRearTarget = 0;
+    int hugi;
 
     @Override
     public void runOpMode() {
@@ -81,12 +86,17 @@ public class TeleOp2 extends LinearOpMode {
         double movementRadians = 0;
         double gamepadXControl = 0;
         double gamepadYControl = 0;
+        boolean collectionMode;
+        boolean coneReceived;
 
         left_front = hardwareMap.get(DcMotor.class, "left_front");
         right_front = hardwareMap.get(DcMotor.class, "right_front");
         left_rear = hardwareMap.get(DcMotor.class, "left_rear");
         right_rear = hardwareMap.get(DcMotor.class, "right_rear");
         slide_motor = hardwareMap.get(DcMotor.class, "slide_motor");
+        Back = hardwareMap.get(Servo.class, "Back");
+        Front = hardwareMap.get(Servo.class, "Front");
+        touch = hardwareMap.get(DigitalChannel.class, "touch");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -100,6 +110,10 @@ public class TeleOp2 extends LinearOpMode {
         slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide_motor.setTargetPosition(0);
         slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide_motor.setPower(0.5);
+        hugi = 0;
+        collectionMode = false;
+        coneReceived = false;
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -153,10 +167,10 @@ public class TeleOp2 extends LinearOpMode {
             right_rear_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
             left_front_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
             left_rear_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
-            right_front.setPower(right_front_power * .75);
-            left_front.setPower(left_front_power * .75);
-            right_rear.setPower(right_rear_power * .75);
-            left_rear.setPower(left_rear_power * .75);
+            right_front.setPower(right_front_power * .5);
+            left_front.setPower(left_front_power * .5);
+            right_rear.setPower(right_rear_power * .5);
+            left_rear.setPower(left_rear_power * .5);
 
             //Declare other button functions here
             //Gamepad 1
@@ -171,44 +185,31 @@ public class TeleOp2 extends LinearOpMode {
 
 
             //Gamepad 2
-            int slideTopPosition = 600;
-            int slideMiddlePosition = 400;
-            int slideLowPosition = 200;
-            int slideBottomPosition = 50;
-
-            //Move linear slide to top position
-            while (gamepad2.dpad_up) {
-                slide_motor.setPower(0.5);
-                slide_motor.setTargetPosition(slideTopPosition);
-                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            if (gamepad2.a) {
+                collectionMode = true;
+                slide_motor.setTargetPosition(200);
+                Back.setPosition(0);
+                Front.setPosition(1);
             }
-
-            //Move linear slide to middle position
-            while (gamepad2.dpad_left) {
-                slide_motor.setPower(0.5);
-                slide_motor.setTargetPosition(slideMiddlePosition);
-                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            if (collectionMode) {
+                if (touch.getState() == false) {
+                    coneReceived = true;
+                    Back.setPosition(0.5);
+                    Front.setPosition(0.5);
+                    slide_motor.setTargetPosition(1400);
+                }
+                if (coneReceived) {
+                    hug();
+                }
             }
-
-            //Move linear slide to low position
-            while (gamepad2.dpad_right) {
-                slide_motor.setPower(0.5);
-                slide_motor.setTargetPosition(slideLowPosition);
-                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            if (gamepad2.b) {
+                collectionMode = false;
+                Back.setPosition(1);
+                Front.setPosition(0);
+                sleep(250);
+                Back.setPosition(0.5);
+                Front.setPosition(0.5);
             }
-
-            //Move linear slide to bottom position
-            while (gamepad2.dpad_down) {
-                slide_motor.setPower(0.5);
-                slide_motor.setTargetPosition(slideBottomPosition);
-                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            }
-
-            //Run linear slide manually
-        while (gamepad2.left_stick_y != 0) {
-            slide_motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            slide_motor.setPower(gamepad2.left_stick_y);
-                    }
 //        slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             //Pick up cone
 
@@ -220,6 +221,18 @@ public class TeleOp2 extends LinearOpMode {
             slide_motor.setPower(0);
         } //While op mode is active
     } //Run OP Mode
+
+    private void hug() {
+        if (hugi > 20) {
+            Back.setPosition(0);
+            Front.setPosition(1);
+            hugi = 0;
+        } else {
+            hugi += 1;
+            Back.setPosition(0.5);
+            Front.setPosition(0.5);
+        }
+    }
 
         //Constants and functions for adding automatic steering controls
         static final double COUNTS_PER_MOTOR_REV = 28.0;   // Rev Ultraplanetary HD Hex motor: 28.0
