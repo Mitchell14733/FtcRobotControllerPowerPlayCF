@@ -94,7 +94,7 @@ public class HugPowerPlay extends LinearOpMode {
                 // Put loop blocks here.
                 if (gamepad2.a) {
                     collectionMode = true;
-                    slide_motor.setTargetPosition(200);
+                    slide_motor.setTargetPosition(0);
                     Back.setPosition(0);
                     Front.setPosition(1);
                 }
@@ -111,6 +111,7 @@ public class HugPowerPlay extends LinearOpMode {
                 }
                 if (gamepad2.b) {
                     collectionMode = false;
+                    coneReceived = false;
                     Back.setPosition(1);
                     Front.setPosition(0);
                     sleep(250);
@@ -131,7 +132,7 @@ public class HugPowerPlay extends LinearOpMode {
             Front.setPosition(1);
             hugi = 0;
         } else {
-            hugi = hugi + 1;
+            hugi += 1;
             Back.setPosition(0.5);
             Front.setPosition(0.5);
         }
