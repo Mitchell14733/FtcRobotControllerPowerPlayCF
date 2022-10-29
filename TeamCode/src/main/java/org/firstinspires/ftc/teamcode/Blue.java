@@ -348,7 +348,7 @@ public class Blue extends LinearOpMode {
 //            telemetry.update();
 //        }
 
-        // ******************************* Play button pushed *******************************
+        // ******************************* Play button pushed *********************** ********
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize

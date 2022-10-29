@@ -83,7 +83,7 @@ public class HugPowerPlay extends LinearOpMode {
         slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide_motor.setTargetPosition(0);
         slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide_motor.setPower(0.5);
+        slide_motor.setPower(0.75);
         hugi = 0;
         collectionMode = false;
         coneReceived = false;
