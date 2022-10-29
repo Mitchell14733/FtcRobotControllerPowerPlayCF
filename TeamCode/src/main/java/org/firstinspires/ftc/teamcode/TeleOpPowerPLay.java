@@ -20,10 +20,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /*********************************************/
 
-@TeleOp(name="TeleOp2", group="Linear Opmode")
+@TeleOp(name="TeleOpPowerPLay", group="Linear Opmode")
 //@Disabled
 
-public class TeleOp2 extends LinearOpMode {
+public class TeleOpPowerPLay extends LinearOpMode {
 
     // The IMU sensor object
     BNO055IMU imu;
@@ -59,7 +59,6 @@ public class TeleOp2 extends LinearOpMode {
     private int leftRearTarget = 0;
     private int rightFrontTarget = 0;
     private int rightRearTarget = 0;
-    int hugi;
 
     @Override
     public void runOpMode() {
@@ -110,8 +109,7 @@ public class TeleOp2 extends LinearOpMode {
         slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide_motor.setTargetPosition(0);
         slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide_motor.setPower(0.5);
-        hugi = 0;
+        slide_motor.setPower(0.75);
         collectionMode = false;
         coneReceived = false;
 
@@ -167,16 +165,24 @@ public class TeleOp2 extends LinearOpMode {
             right_rear_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
             left_front_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
             left_rear_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
-            right_front.setPower(right_front_power * .5);
-            left_front.setPower(left_front_power * .5);
-            right_rear.setPower(right_rear_power * .5);
-            left_rear.setPower(left_rear_power * .5);
+            right_front.setPower(right_front_power * DRIVE_SPEED);
+            left_front.setPower(left_front_power * DRIVE_SPEED);
+            right_rear.setPower(right_rear_power * DRIVE_SPEED);
+            left_rear.setPower(left_rear_power * DRIVE_SPEED);
 
             //Declare other button functions here
-            //Gamepad 1
+            //*****************************     Gamepad 1     **************************************
+            if (gamepad1.left_bumper){ //Slow down for precision
+                DRIVE_SPEED = 0.25;
+            }
+            else{
+                DRIVE_SPEED = 0.75;
+            }
+
             //Spin 180 degrees
-            while (gamepad1.right_bumper) {
-                turnToHeading(TURN_SPEED, angles.firstAngle - 180);
+            if (gamepad1.right_bumper) {
+                float currentHeading = angles.firstAngle;
+                turnToHeading(TURN_SPEED, currentHeading - 180);
             }
 
             //Reset Heading
@@ -184,51 +190,56 @@ public class TeleOp2 extends LinearOpMode {
 //                resetHeading();
 
 
-            //Gamepad 2
+            //*****************************     Gamepad 2     **************************************
+            //Pick up cone
             if (gamepad2.a) {
-                collectionMode = true;
-                slide_motor.setTargetPosition(200);
-                Back.setPosition(0);
+                collectionMode = true; //waiting for cone to trigger touch sensor
+                slide_motor.setTargetPosition(100); //Drop until cone is picked up
+                Back.setPosition(0); //turn servos to intake mode
                 Front.setPosition(1);
             }
+            //Cone is collected
             if (collectionMode) {
-                if (touch.getState() == false) {
-                    coneReceived = true;
-                    Back.setPosition(0.5);
-                    Front.setPosition(0.5);
-                    slide_motor.setTargetPosition(1400);
-                }
-                if (coneReceived) {
-                    hug();
+                if (!touch.getState()) { //!touch.getState() = switch is pressed
+                    collectionMode = false; //no longer in collection mode
+                    coneReceived = true; //triggers the keepCone method
+                    slide_motor.setTargetPosition(1400); //pop slide to the middle position
                 }
             }
-            if (gamepad2.b) {
-                collectionMode = false;
+            if (coneReceived) {
+                    keepCone(); //turns on servos if switch contact is lost
+                }
+
+            if (gamepad2.b) { //drop the cone
+                coneReceived = false; //reset this variable
                 Back.setPosition(1);
                 Front.setPosition(0);
-                sleep(250);
+                sleep(350); //nobody move while we drop this!
                 Back.setPosition(0.5);
                 Front.setPosition(0.5);
             }
-//        slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            //Pick up cone
-
-
-            //Drop cone
-
-
+            if (gamepad2.dpad_up) {
+                slide_motor.setTargetPosition(3400); //move slide to High position
+            }
+            if (gamepad2.dpad_right) {
+                slide_motor.setTargetPosition(2400); //move slide to Medium position
+            }
+            if (gamepad2.dpad_down) {
+                slide_motor.setTargetPosition(1450); //move slide to Low position
+            }
+            if (gamepad2.dpad_left) {
+                slide_motor.setTargetPosition(950); //move slide to cone pickup position/Off the ground for ground junction
+            }
             telemetry.update();
-            slide_motor.setPower(0);
-        } //While op mode is active
-    } //Run OP Mode
 
-    private void hug() {
-        if (hugi > 20) {
+        } //End of while op mode is active
+    } //End of run OP Mode
+
+    private void keepCone() {
+        if (touch.getState()) {
             Back.setPosition(0);
             Front.setPosition(1);
-            hugi = 0;
         } else {
-            hugi += 1;
             Back.setPosition(0.5);
             Front.setPosition(0.5);
         }
@@ -243,7 +254,7 @@ public class TeleOp2 extends LinearOpMode {
 
         // These constants define the desired driving/control characteristics
         // They can/should be tweaked to suit the specific robot drive train.
-        static final double DRIVE_SPEED = 0.4;     // Max driving speed for better distance accuracy.
+        static double DRIVE_SPEED = 0.75;     // Max driving speed for better distance accuracy.
         static final double TURN_SPEED = 1.0;     // Max Turn speed to limit turn rate
         static final double HEADING_THRESHOLD = 1.0;    // How close must the heading get to the target before moving to next step.
         // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
@@ -272,6 +283,7 @@ public class TeleOp2 extends LinearOpMode {
                 moveRobot(0, turnSpeed);
 
             }
+            moveRobot(0, 0);
         }
 
         /**

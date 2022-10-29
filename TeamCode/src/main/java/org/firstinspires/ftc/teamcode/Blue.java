@@ -37,6 +37,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -329,6 +330,8 @@ public class Blue extends LinearOpMode {
          */
 
         /* Update the telemetry */
+        camera.closeCameraDevice(); //shut off the camera to preserve battery
+
         if(tagOfInterest != null)
         {
             telemetry.addLine("Tag snapshot:\n");
@@ -341,14 +344,7 @@ public class Blue extends LinearOpMode {
             telemetry.update();
         }
 
-
-//        // Wait for the game to start (Display Gyro value while waiting)
-//        while (opModeInInit()) {
-//            telemetry.addData(">", "Robot Heading = %4.0f", getRawHeading());
-//            telemetry.update();
-//        }
-
-        // ******************************* Play button pushed *********************** ********
+        // ******************************* Play button pushed ********************************
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
