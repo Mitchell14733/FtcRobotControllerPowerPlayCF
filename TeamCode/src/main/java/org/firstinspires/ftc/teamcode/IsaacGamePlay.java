@@ -33,6 +33,9 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -98,6 +101,14 @@ public class IsaacGamePlay extends LinearOpMode {
     private DcMotor right_rear  = null;
     private DcMotor left_rear   = null;
     private BNO055IMU imu       = null;      // Control/Expansion Hub IMU
+    private DcMotor slide_motor = null;
+    private Servo Back          = null;
+    private Servo Front         = null;
+    private DigitalChannel touch;
+
+
+
+
 
     private double left_front_power;
     private double right_front_power;
@@ -154,6 +165,14 @@ public class IsaacGamePlay extends LinearOpMode {
         right_front = hardwareMap.get(DcMotor.class, "right_front");
         left_rear = hardwareMap.get(DcMotor.class, "left_rear");
         right_rear = hardwareMap.get(DcMotor.class, "right_rear");
+        slide_motor = hardwareMap.get(DcMotor.class, "slide_motor");
+        Back = hardwareMap.get(Servo.class, "Back");
+        Front = hardwareMap.get(Servo.class, "Front");
+        touch = hardwareMap.get(DigitalChannel.class, "touch");
+        boolean collectionMode = false;
+        boolean coneReceived = false;
+
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -162,6 +181,7 @@ public class IsaacGamePlay extends LinearOpMode {
         left_rear.setDirection(DcMotor.Direction.FORWARD);
         right_front.setDirection(DcMotor.Direction.REVERSE);
         right_rear.setDirection(DcMotor.Direction.REVERSE);
+        slide_motor.setDirection(DcMotor.Direction.FORWARD);
 
         // define initialization values for IMU, and then initialize it.
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -180,7 +200,12 @@ public class IsaacGamePlay extends LinearOpMode {
         left_rear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         right_rear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Wait for the game to start (Display Gyro value while waiting)
+        slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide_motor.setTargetPosition(0);
+        slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Wait for the game to start (Display Gyro value while waiting\
         while (opModeInInit()) {
             telemetry.addData(">", "Robot Heading = %4.0f", getRawHeading());
             telemetry.update();
@@ -192,15 +217,72 @@ public class IsaacGamePlay extends LinearOpMode {
         left_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_rear.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        int slideTopPosition = 3500;
+        int slideMiddlePosition = 2500;
+        int slideLowPosition = 1500;
+        int slideBottomPosition = 0;
+        int slideconecollectPosition = 950;
+
         resetHeading();
 
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
-driveStraight(DRIVE_SPEED, 10, 0.0);
-turnToHeading(TURN_SPEED, -10);
-driveStraight(DRIVE_SPEED, 11, -10);
+        slide_motor.setPower(0.5);
+        slide_motor.setTargetPosition(slideTopPosition);
+        driveStraight(DRIVE_SPEED, 45, 0.0); //Leave start
+        turnToHeading(TURN_SPEED, 67); //turn towards high junction
+        holdHeading(TURN_SPEED, 67, 0.3); //hold holding that is faced to the high junction
+        driveStraight(DRIVE_SPEED,16, 25); //go to high junction
+//        slide_motor.setTargetPosition(slideTopPosition);
+        Back.setPosition(1); //put the cone on high junction
+        Front.setPosition(0); //put cone on high junction
+        sleep(4000);
+        Back.setPosition(0.5);
+        Front.setPosition(0.5);
+        turnToHeading(TURN_SPEED, 0.0); //turn straight
+        holdHeading(TURN_SPEED, 0.0, 0.3);  //hold the robot
+        driveStraight(DRIVE_SPEED, -5, 0.0);  // back up from the high junction
+        slide_motor.setTargetPosition(slideLowPosition);
+        turnToHeading(TURN_SPEED, -87);  // turn towards the stack of cones
+        holdHeading(TURN_SPEED, -87, 0.3); // hold the robot facing the stack of cones
+        driveStraight(DRIVE_SPEED, 32, -90); // go to stack of cones
+        slide_motor.setTargetPosition(slideconecollectPosition); // go to height of the stack of cones
+        slide_motor.setTargetPosition(100); //Drop until cone is picked up
+        Back.setPosition(0); //pick up the cone
+        Front.setPosition(1); //pick up the cone
+        if (!touch.getState()) { //!touch.getState() = switch is pressed
+            slide_motor.setTargetPosition(slideconecollectPosition); // go to height of the stack of cones
+            Back.setPosition(0); //pick up the cone
+            Front.setPosition(1); //pick up the cone
+            slide_motor.setTargetPosition(slideLowPosition);
+        }
+        turnToHeading(TURN_SPEED, 90);
+        holdHeading(TURN_SPEED, 90, 0.3);
+        driveStraight(DRIVE_SPEED, 64, 90);
+        turnToHeading(TURN_SPEED, 0);
+        holdHeading(TURN_SPEED, 0, 0.3);
+        turnToHeading(TURN_SPEED, 25);
+        holdHeading(TURN_SPEED, 25, 0.3);
+        driveStraight(DRIVE_SPEED, 24, 25);
+        slide_motor.setTargetPosition(slideTopPosition);
+        Back.setPosition(0); //put the cone on high junction
+        Front.setPosition(1); //put cone on high junction
+
+
+
+
+
+
+
+
+
+        sleep(2000);
+
+
+
+
 
 
         telemetry.addData("Path", "Complete");
