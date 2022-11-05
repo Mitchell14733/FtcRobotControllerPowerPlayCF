@@ -235,7 +235,7 @@ public class IsaacGamePlay extends LinearOpMode {
         turnToHeading(TURN_SPEED, 67); //turn towards high junction
         holdHeading(TURN_SPEED, 67, 0.3); //hold holding that is faced to the high junction
         driveStraight(DRIVE_SPEED,16, 25); //go to high junction
-//        slide_motor.setTargetPosition(slideTopPosition);
+//         slide_motor.setTargetPosition(slideTopPosition);
         Back.setPosition(1); //put the cone on high junction
         Front.setPosition(0); //put cone on high junction
         sleep(4000);
