@@ -398,7 +398,7 @@ public class LeftRed extends LinearOpMode {
         driveStraight(DRIVE_SPEED, -33.5, -90);
         }
 
-//     driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
+//        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
 
         sleep(1000);  // Pause to display last telemetry message.
 
