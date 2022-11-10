@@ -147,8 +147,8 @@ public class RightBlue extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .4;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .4;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -377,25 +377,30 @@ public class RightBlue extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(1000);
         driveStraight(DRIVE_SPEED, -30, -84.5);
-        turnToHeading(TURN_SPEED,  136);
-        holdHeading(TURN_SPEED,  136, 0.5);
-        driveStraight(DRIVE_SPEED, 16.5, 136);
+        turnToHeading(TURN_SPEED,  130);
+        holdHeading(TURN_SPEED,  130, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, 130);
         Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -14.75, 136);
-       turnToHeading(TURN_SPEED,  100);
-       holdHeading(TURN_SPEED,  100, 0.5);
+        driveStraight(DRIVE_SPEED, -14.75, 130);
+       turnToHeading(TURN_SPEED,  96);
+       holdHeading(TURN_SPEED,  96, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
-            driveStraight(DRIVE_SPEED, 36.5, 100);
+            driveStraight(DRIVE_SPEED, 36.5, 96);
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else if(tagOfInterest.id == MIDDLE) {
         // Drive to middle, needed because there need to be this or it will never run middle
-
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else {
-        driveStraight(DRIVE_SPEED, -30.75, 100);
+        driveStraight(DRIVE_SPEED, -30.75, 96);
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"

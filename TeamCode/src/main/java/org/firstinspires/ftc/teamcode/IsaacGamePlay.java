@@ -245,11 +245,12 @@ public class IsaacGamePlay extends LinearOpMode {
         holdHeading(TURN_SPEED, 0.0, 0.3);  //hold the robot
         driveStraight(DRIVE_SPEED, -5, 0.0);  // back up from the high junction
         slide_motor.setTargetPosition(slideLowPosition);
-        turnToHeading(TURN_SPEED, -87);  // turn towards the stack of cones
-        holdHeading(TURN_SPEED, -87, 0.3); // hold the robot facing the stack of cones
-        driveStraight(DRIVE_SPEED, 32, -90); // go to stack of cones
+        turnToHeading(TURN_SPEED, -80);  // turn towards the stack of cones
+        holdHeading(TURN_SPEED, -80, 0.3); // hold the robot facing the stack of cones
+        driveStraight(DRIVE_SPEED, 35, -80); // go to stack of cones
+        sleep(3000);
         slide_motor.setTargetPosition(slideconecollectPosition); // go to height of the stack of cones
-        slide_motor.setTargetPosition(100); //Drop until cone is picked up
+        slide_motor.setTargetPosition(50); //Drop until cone is picked up
         Back.setPosition(0); //pick up the cone
         Front.setPosition(1); //pick up the cone
         if (!touch.getState()) { //!touch.getState() = switch is pressed
@@ -258,9 +259,17 @@ public class IsaacGamePlay extends LinearOpMode {
             Front.setPosition(1); //pick up the cone
             slide_motor.setTargetPosition(slideLowPosition);
         }
+        sleep(1500);
+        Back.setPosition(0.5); //pick up the cone
+        Front.setPosition(0.5); //pick up the cone
+
+
+        slide_motor.setTargetPosition(slideMiddlePosition);
+        sleep(1000);
+        driveStraight(DRIVE_SPEED, -11, 90);
         turnToHeading(TURN_SPEED, 90);
         holdHeading(TURN_SPEED, 90, 0.3);
-        driveStraight(DRIVE_SPEED, 64, 90);
+        driveStraight(DRIVE_SPEED, 54, 90);
         turnToHeading(TURN_SPEED, 0);
         holdHeading(TURN_SPEED, 0, 0.3);
         turnToHeading(TURN_SPEED, 25);
