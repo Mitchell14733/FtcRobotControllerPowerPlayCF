@@ -20,10 +20,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 /*********************************************/
 
-@TeleOp(name="TeleOpPowerPLay", group="Linear Opmode")
+@TeleOp(name="ROVTeleOpPowerPLay", group="Linear Opmode")
 //@Disabled
 
-public class TeleOpPowerPLay extends LinearOpMode {
+public class ROVTeleOpPowerPLay extends LinearOpMode {
 
     // The IMU sensor object
     BNO055IMU imu;
@@ -104,6 +104,10 @@ public class TeleOpPowerPLay extends LinearOpMode {
         left_rear.setDirection(DcMotor.Direction.REVERSE);
         right_rear.setDirection(DcMotor.Direction.FORWARD);
         slide_motor.setDirection(DcMotor.Direction.FORWARD);
+//        left_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        right_front.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        left_rear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        right_rear.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -137,38 +141,92 @@ public class TeleOpPowerPLay extends LinearOpMode {
             telemetry.addData("LR POWER", ("%.3f"), left_rear_power);
             telemetry.addData("Slide", "%7d", slide_motor.getCurrentPosition());
 
-            driveTurn = -gamepad1.left_stick_x;
-            gamepadXCoordinate = gamepad1.right_stick_x; //this simply gives our x value relative to the driver
-            gamepadYCoordinate = -gamepad1.right_stick_y; //this simply gives our y value relative to the driver
-            gamepadHypot = Range.clip(Math.hypot(gamepadXCoordinate, gamepadYCoordinate), 0, 1);
-
-            //finds just how much power to give the robot based on how much x and y given by gamepad
-            //range.clip helps us keep our power within positive 1
-            // also helps set maximum possible value of 1/sqrt(2) for x and y controls if at a 45 degree angle (which yields greatest possible value for y+x)
-
-            gamepadRadians = Math.atan2(gamepadYCoordinate, gamepadXCoordinate);// - Math.PI/2; //the inverse tangent of opposite/adjacent gives us our gamepad degree
-
-            robotRadians = (gyro_degrees * Math.PI / 180); //gives us the angle our robot is at, in radians
-
-            movementRadians = gamepadRadians - robotRadians; //adjust the angle we need to move at by finding needed
-            // movement degree based on gamepad and robot angles
-            gamepadXControl = Math.cos(movementRadians) * gamepadHypot;
-            //by finding the adjacent side, we can get our needed x value to power our motors
-            gamepadYControl = Math.sin(movementRadians) * gamepadHypot;
-            //by finding the opposite side, we can get our needed y value to power our motors
+//            driveTurn = -gamepad1.left_stick_x;
+//            gamepadXCoordinate = gamepad1.right_stick_x; //this simply gives our x value relative to the driver
+//            gamepadYCoordinate = -gamepad1.right_stick_y; //this simply gives our y value relative to the driver
+//            gamepadHypot = Range.clip(Math.hypot(gamepadXCoordinate, gamepadYCoordinate), 0, 1);
+//
+//            //finds just how much power to give the robot based on how much x and y given by gamepad
+//            //range.clip helps us keep our power within positive 1
+//            // also helps set maximum possible value of 1/sqrt(2) for x and y controls if at a 45 degree angle (which yields greatest possible value for y+x)
+//
+//            gamepadRadians = Math.atan2(gamepadYCoordinate, gamepadXCoordinate);// - Math.PI/2; //the inverse tangent of opposite/adjacent gives us our gamepad degree
+//
+//            robotRadians = (gyro_degrees * Math.PI / 180); //gives us the angle our robot is at, in radians
+//
+//            movementRadians = gamepadRadians - robotRadians; //adjust the angle we need to move at by finding needed
+//            // movement degree based on gamepad and robot angles
+//            gamepadXControl = Math.cos(movementRadians) * gamepadHypot;
+//            //by finding the adjacent side, we can get our needed x value to power our motors
+//            gamepadYControl = Math.sin(movementRadians) * gamepadHypot;
+//            //by finding the opposite side, we can get our needed y value to power our motors
 
             //by multiplying the gamepadYControl and gamepadXControl by their respective absolute values, we can guarantee that our motor powers will
             // not exceed 1 without any driveTurn
             //since we've maxed out our hypot at 1, the greatest possible value of x+y is (1/sqrt(2)) + (1/sqrt(2)) = sqrt(2)
             //since (1/sqrt(2))^2 = 1/2 = .5, we know that we will not exceed a power of 1 (with no turn), giving us more precision for our driving
-            right_front_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
-            right_rear_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
-            left_front_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
-            left_rear_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
-            right_front.setPower(right_front_power * DRIVE_SPEED);
-            left_front.setPower(left_front_power * DRIVE_SPEED);
-            right_rear.setPower(right_rear_power * DRIVE_SPEED);
-            left_rear.setPower(left_rear_power * DRIVE_SPEED);
+//            right_front_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
+//            right_rear_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) - driveTurn);
+//            left_front_power = (gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
+//            left_rear_power = (gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) + driveTurn);
+
+//            ******************************** ROV Changes ********************************
+            //Drive forward/backward
+            double y = gamepad1.right_stick_y; // Remember, this is reversed!
+            double x = -gamepad1.right_stick_x * 1; // Counteract imperfect strafing
+            double rx = -gamepad1.left_stick_x;
+
+            // Denominator is the largest motor power (absolute value) or 1
+            // This ensures all the powers maintain the same ratio, but only when
+            // at least one is out of the range [-1, 1]
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double leftFrontPower = (y + x + rx) / denominator;
+            double leftRearPower = (y - x + rx) / denominator;
+            double rightFrontPower = (y - x - rx) / denominator;
+            double rightRearPower = (y + x - rx) / denominator;
+
+            left_front.setPower(leftFrontPower * DRIVE_SPEED);
+            left_rear.setPower(leftRearPower * DRIVE_SPEED);
+            right_front.setPower(rightFrontPower * DRIVE_SPEED);
+            right_rear.setPower(rightRearPower * DRIVE_SPEED);
+
+//            if (gamepad1.right_stick_y != 0) {
+//                right_front.setPower(gamepad1.right_stick_y * DRIVE_SPEED);
+//                left_front.setPower(gamepad1.right_stick_y * DRIVE_SPEED);
+//                right_rear.setPower(gamepad1.right_stick_y * DRIVE_SPEED);
+//                left_rear.setPower(gamepad1.right_stick_y * DRIVE_SPEED);
+//            }
+//
+//            //Strafe
+//            if (gamepad1.right_stick_x != 0) {
+//                right_front.setPower(gamepad1.right_stick_x * DRIVE_SPEED);
+//                left_front.setPower(-gamepad1.right_stick_x * DRIVE_SPEED);
+//                right_rear.setPower(-gamepad1.right_stick_x * DRIVE_SPEED);
+//                left_rear.setPower(gamepad1.right_stick_x * DRIVE_SPEED);
+//            }
+//
+//            if (gamepad1.right_stick_x == 0) {
+//                right_front.setPower(0);
+//                left_front.setPower(0);
+//                right_rear.setPower(0);
+//                left_rear.setPower(0);
+//            }
+//
+//            if (gamepad1.right_stick_y == 0) {
+//                right_front.setPower(0);
+//                left_front.setPower(0);
+//                right_rear.setPower(0);
+//                left_rear.setPower(0);
+//            }
+//
+//            //rotate
+//            if (gamepad1.left_stick_x !=0) {
+//                right_front.setPower(-gamepad1.left_stick_x * DRIVE_SPEED);
+//                left_front.setPower(gamepad1.left_stick_x * DRIVE_SPEED);
+//                right_rear.setPower(-gamepad1.left_stick_x * DRIVE_SPEED);
+//                left_rear.setPower(gamepad1.left_stick_x * DRIVE_SPEED);
+//            }
+
 
             //Declare other button functions here
             //*****************************     Gamepad 1     **************************************
@@ -180,10 +238,11 @@ public class TeleOpPowerPLay extends LinearOpMode {
             }
 
             //Spin 180 degrees
-            //if (gamepad1.right_bumper) {
-            //    float currentHeading = angles.firstAngle;
-            //    turnToHeading(TURN_SPEED, currentHeading - 180);
-          //  }
+            if (gamepad1.right_bumper) {
+
+                float currentHeading = angles.firstAngle;
+                turnToHeading(TURN_SPEED, currentHeading - 180);
+            }
 
             //Reset Heading
 //            while (gamepad1.left_bumper) {
@@ -244,6 +303,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
             Front.setPosition(0.5);
         }
     }
+
 
         //Constants and functions for adding automatic steering controls
         static final double COUNTS_PER_MOTOR_REV = 28.0;   // Rev Ultraplanetary HD Hex motor: 28.0

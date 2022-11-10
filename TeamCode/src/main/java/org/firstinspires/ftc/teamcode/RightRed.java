@@ -375,26 +375,32 @@ public class RightRed extends LinearOpMode {
 
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
-        driveStraight(DRIVE_SPEED, -30, -84.5);
-        turnToHeading(TURN_SPEED,  136);
-        holdHeading(TURN_SPEED,  136, 0.5);
-        driveStraight(DRIVE_SPEED, 16.5, 136);
+        driveStraight(DRIVE_SPEED, -37, -84.5);
+        turnToHeading(TURN_SPEED,  133);
+        holdHeading(TURN_SPEED,  133, 0.5);
+        driveStraight(DRIVE_SPEED, 14, 133);
+        sleep(1500);
         Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -14.75, 136);
-       turnToHeading(TURN_SPEED,  90);
-       holdHeading(TURN_SPEED,  90, 0.5);
+        driveStraight(DRIVE_SPEED, -14.75, 133);
+       turnToHeading(TURN_SPEED,  95);
+       holdHeading(TURN_SPEED,  95, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
-            driveStraight(DRIVE_SPEED, 30.5, 90);
+            driveStraight(DRIVE_SPEED, 30.5, 95);
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else if(tagOfInterest.id == MIDDLE) {
         // Drive to middle, needed because there need to be this or it will never run middle
-
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else {
-        driveStraight(DRIVE_SPEED, -33.5, 120);
+        driveStraight(DRIVE_SPEED, -33.5, 95);
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
