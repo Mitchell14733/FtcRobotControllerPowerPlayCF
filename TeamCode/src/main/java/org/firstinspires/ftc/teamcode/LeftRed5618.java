@@ -146,8 +146,8 @@ public class LeftRed5618 extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .4;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .4;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -239,7 +239,7 @@ public class LeftRed5618 extends LinearOpMode {
         resetHeading();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
@@ -376,12 +376,12 @@ public class LeftRed5618 extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
         driveStraight(DRIVE_SPEED, -30, 96);
-        turnToHeading(TURN_SPEED,  -130);
-        holdHeading(TURN_SPEED,  -130, 0.5);
-        driveStraight(DRIVE_SPEED, 16.5, -130);
+        turnToHeading(TURN_SPEED,  -125);
+        holdHeading(TURN_SPEED,  -125, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, -125);
         Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -14.75, -130);
+        driveStraight(DRIVE_SPEED, -14.75, -125);
        turnToHeading(TURN_SPEED,  -90);
        holdHeading(TURN_SPEED,  -90, 0.5);
 
@@ -397,14 +397,16 @@ public class LeftRed5618 extends LinearOpMode {
             holdHeading(TURN_SPEED,  180, 0.5);
         }
         else {
-        driveStraight(DRIVE_SPEED, -33.5, -90);
+        driveStraight(DRIVE_SPEED, -30.5, -90);
             turnToHeading(TURN_SPEED,  180);
             holdHeading(TURN_SPEED,  180, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
 
-        sleep(1000);  // Pause to display last telemetry message.
+        slide_motor.setPower(0.4);
+        slide_motor.setTargetPosition(-20);
+        sleep(3500);
 
     }
 

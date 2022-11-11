@@ -97,9 +97,9 @@ import java.util.ArrayList;
  *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="LeftBlue", group="Robot")
+@Autonomous(name="RightRed5618", group="Robot")
 //@Disabled
-public class LeftBlue extends LinearOpMode {
+public class RightRed5618 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor left_front  = null;
@@ -146,8 +146,8 @@ public class LeftBlue extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .4;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .4;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -352,17 +352,16 @@ public class LeftBlue extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         driveStraight(DRIVE_SPEED, 70, 0);
         driveStraight(DRIVE_SPEED, -9, 0);
-        turnToHeading(TURN_SPEED,  -137.5);
-        holdHeading(TURN_SPEED,  -137.5, 0.5);
-        driveStraight(DRIVE_SPEED, 10, -137.5);
+        turnToHeading(TURN_SPEED,  145.5);
+        driveStraight(DRIVE_SPEED, 10, 142);
         Output();
         sleep(2000);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -17.5, -137.5);
+        driveStraight(DRIVE_SPEED, -17.5, 142);
         slide_motor.setTargetPosition(900);
-        turnToHeading(TURN_SPEED,  90);
-        holdHeading(TURN_SPEED,  90, 0.5);
-        driveStraight(DRIVE_SPEED, 36, 90);
+        turnToHeading(TURN_SPEED,  -84.5);
+        holdHeading(TURN_SPEED,  -84.5, 0.5);
+        driveStraight(DRIVE_SPEED, 36, -84.5);
         while (touch.getState()) {
             slide_motor.setTargetPosition(450);
             Intake();
@@ -376,31 +375,39 @@ public class LeftBlue extends LinearOpMode {
 
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
-        driveStraight(DRIVE_SPEED, -30, 84.5);
-        turnToHeading(TURN_SPEED,  -136);
-        holdHeading(TURN_SPEED,  -136, 0.5);
-        driveStraight(DRIVE_SPEED, 16.5, -136);
+        driveStraight(DRIVE_SPEED, -37, -84.5);
+        turnToHeading(TURN_SPEED,  145);
+        holdHeading(TURN_SPEED,  145, 0.5);
+        driveStraight(DRIVE_SPEED, 14, 145);
+        sleep(1500);
         Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -14.75, -136);
-       turnToHeading(TURN_SPEED,  -90);
-       holdHeading(TURN_SPEED,  -90, 0.5);
+        driveStraight(DRIVE_SPEED, -14.75, 145);
+       turnToHeading(TURN_SPEED,  95);
+       holdHeading(TURN_SPEED,  95, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
-            driveStraight(DRIVE_SPEED, 30.5, -90);
+            driveStraight(DRIVE_SPEED, 30.5, 95);
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else if(tagOfInterest.id == MIDDLE) {
         // Drive to middle, needed because there need to be this or it will never run middle
-
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else {
-        driveStraight(DRIVE_SPEED, -33.5, -90);
+        driveStraight(DRIVE_SPEED, -30.5, 95);
+            turnToHeading(TURN_SPEED,  180);
+            holdHeading(TURN_SPEED,  180, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
+        slide_motor.setPower(0.4);
+        slide_motor.setTargetPosition(-20);
+        sleep(4000);
 
-        sleep(1000);  // Pause to display last telemetry message.
 
     }
 

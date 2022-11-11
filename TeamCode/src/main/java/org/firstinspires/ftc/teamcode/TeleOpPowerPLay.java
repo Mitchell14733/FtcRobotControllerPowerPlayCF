@@ -82,6 +82,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
         double gamepadHypot = 0;
         double gamepadRadians = 0;
         double robotRadians = 0;
+        double correctedRobotRadians = 0;
         double movementRadians = 0;
         double gamepadXControl = 0;
         double gamepadYControl = 0;
@@ -121,8 +122,8 @@ public class TeleOpPowerPLay extends LinearOpMode {
 
             /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            float gyro_degrees = (angles.firstAngle);
-            telemetry.addData("Yaw", ("%.3f"), robotRadians);
+            float gyro_degrees = (angles.firstAngle) - (float)headingOffset;
+            telemetry.addData("Yaw", ("%.3f"),gyro_degrees);
             telemetry.addData("Left X", ("%.3f"), gamepad1.left_stick_x);
             telemetry.addData("Right X", ("%.3f"), gamepad1.right_stick_x);
             telemetry.addData("Right Y", ("%.3f"), gamepad1.right_stick_y);
@@ -176,7 +177,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
                 DRIVE_SPEED = 0.25;
             }
             else{
-                DRIVE_SPEED = 0.75;
+                DRIVE_SPEED = 0.65;
             }
 
             //Spin 180 degrees
@@ -186,9 +187,9 @@ public class TeleOpPowerPLay extends LinearOpMode {
           //  }
 
             //Reset Heading
-//            while (gamepad1.left_bumper) {
-//                resetHeading();
-
+           while (gamepad1.right_bumper) {
+               resetHeading();
+           }
 
             //*****************************     Gamepad 2     **************************************
             //Pick up cone

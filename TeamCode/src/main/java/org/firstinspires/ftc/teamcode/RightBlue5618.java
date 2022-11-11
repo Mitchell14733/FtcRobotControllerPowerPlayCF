@@ -29,24 +29,25 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.openftc.apriltag.AprilTagDetection;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import java.util.ArrayList;
 
@@ -97,9 +98,9 @@ import java.util.ArrayList;
  *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="RightRed", group="Robot")
+@Autonomous(name="RightBlue5618", group="Robot")
 //@Disabled
-public class RightRed extends LinearOpMode {
+public class RightBlue5618 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor left_front  = null;
@@ -146,8 +147,8 @@ public class RightRed extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .4;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .4;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -178,7 +179,7 @@ public class RightRed extends LinearOpMode {
     int MIDDLE  = 36;
     int RIGHT   = 37;
     int slideTopPosition = 3400;
-    int slideMiddlePosition = 2500;
+    int slideMiddlePosition = 2550;
     int slideLowPosition = 1400;
     int slideBottomPosition = 50;
 
@@ -327,8 +328,6 @@ public class RightRed extends LinearOpMode {
          */
 
         /* Update the telemetry */
-        camera.closeCameraDevice(); //shut off the camera to preserve battery
-
         if(tagOfInterest != null)
         {
             telemetry.addLine("Tag snapshot:\n");
@@ -341,7 +340,14 @@ public class RightRed extends LinearOpMode {
             telemetry.update();
         }
 
-        // ******************************* Play button pushed ********************************
+
+//        // Wait for the game to start (Display Gyro value while waiting)
+//        while (opModeInInit()) {
+//            telemetry.addData(">", "Robot Heading = %4.0f", getRawHeading());
+//            telemetry.update();
+//        }
+
+        // ******************************* Play button pushed *********************** ********
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
@@ -350,14 +356,14 @@ public class RightRed extends LinearOpMode {
         slide_motor.setPower(0.75);
 
         slide_motor.setTargetPosition(slideMiddlePosition);
-        driveStraight(DRIVE_SPEED, 70, 0);
-        driveStraight(DRIVE_SPEED, -9, 0);
-        turnToHeading(TURN_SPEED,  145.5);
-        driveStraight(DRIVE_SPEED, 10, 142);
+        driveStraight(DRIVE_SPEED, 68, 0);
+        driveStraight(DRIVE_SPEED, -7, 0);
+        turnToHeading(TURN_SPEED,  142);
+        driveStraight(DRIVE_SPEED, 11.5, 142);
         Output();
         sleep(2000);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -17.5, 142);
+        driveStraight(DRIVE_SPEED, -15, 142);
         slide_motor.setTargetPosition(900);
         turnToHeading(TURN_SPEED,  -84.5);
         holdHeading(TURN_SPEED,  -84.5, 0.5);
@@ -374,21 +380,20 @@ public class RightRed extends LinearOpMode {
         }
 
         slide_motor.setTargetPosition(slideMiddlePosition);
-        sleep(750);
-        driveStraight(DRIVE_SPEED, -37, -84.5);
-        turnToHeading(TURN_SPEED,  133);
-        holdHeading(TURN_SPEED,  133, 0.5);
-        driveStraight(DRIVE_SPEED, 14, 133);
-        sleep(1500);
+        sleep(1000);
+        driveStraight(DRIVE_SPEED, -30, -84.5);
+        turnToHeading(TURN_SPEED,  130);
+        holdHeading(TURN_SPEED,  130, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, 130);
         Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -14.75, 133);
-       turnToHeading(TURN_SPEED,  95);
-       holdHeading(TURN_SPEED,  95, 0.5);
+        driveStraight(DRIVE_SPEED, -14.75, 130);
+       turnToHeading(TURN_SPEED,  96);
+       holdHeading(TURN_SPEED,  96, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
-            driveStraight(DRIVE_SPEED, 30.5, 95);
+            driveStraight(DRIVE_SPEED, 30.5, 96);
             turnToHeading(TURN_SPEED,  180);
             holdHeading(TURN_SPEED,  180, 0.5);
         }
@@ -398,14 +403,16 @@ public class RightRed extends LinearOpMode {
             holdHeading(TURN_SPEED,  180, 0.5);
         }
         else {
-        driveStraight(DRIVE_SPEED, -33.5, 95);
+        driveStraight(DRIVE_SPEED, -30.75, 96);
             turnToHeading(TURN_SPEED,  180);
             holdHeading(TURN_SPEED,  180, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
 
-        sleep(1000);  // Pause to display last telemetry message.
+        slide_motor.setPower(0.4);
+        slide_motor.setTargetPosition(-20);
+        sleep(4000);
 
     }
 
