@@ -97,9 +97,9 @@ import java.util.ArrayList;
  *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@Autonomous(name="RightRed", group="Robot")
+@Autonomous(name="LeftBlue5618", group="Robot")
 //@Disabled
-public class RightRed extends LinearOpMode {
+public class LeftBlue5618 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor left_front  = null;
@@ -146,8 +146,8 @@ public class RightRed extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .4;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .4;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -352,16 +352,16 @@ public class RightRed extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         driveStraight(DRIVE_SPEED, 70, 0);
         driveStraight(DRIVE_SPEED, -9, 0);
-        turnToHeading(TURN_SPEED,  145.5);
-        driveStraight(DRIVE_SPEED, 10, 142);
+        turnToHeading(TURN_SPEED,  -120.5);
+        driveStraight(DRIVE_SPEED, 12, -120.5);
         Output();
         sleep(2000);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -17.5, 142);
+        driveStraight(DRIVE_SPEED, -19.5, -120.5);
         slide_motor.setTargetPosition(900);
-        turnToHeading(TURN_SPEED,  -84.5);
-        holdHeading(TURN_SPEED,  -84.5, 0.5);
-        driveStraight(DRIVE_SPEED, 36, -84.5);
+        turnToHeading(TURN_SPEED,  96);
+        holdHeading(TURN_SPEED,  96, 0.5);
+        driveStraight(DRIVE_SPEED, 36, 96);
         while (touch.getState()) {
             slide_motor.setTargetPosition(450);
             Intake();
@@ -375,20 +375,19 @@ public class RightRed extends LinearOpMode {
 
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
-        driveStraight(DRIVE_SPEED, -37, -84.5);
-        turnToHeading(TURN_SPEED,  133);
-        holdHeading(TURN_SPEED,  133, 0.5);
-        driveStraight(DRIVE_SPEED, 14, 133);
-        sleep(1500);
+        driveStraight(DRIVE_SPEED, -30, 96);
+        turnToHeading(TURN_SPEED,  -120);
+        holdHeading(TURN_SPEED,  -120, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, -120);
         Output();
         sleep(2000);
-        driveStraight(DRIVE_SPEED, -14.75, 133);
-       turnToHeading(TURN_SPEED,  95);
-       holdHeading(TURN_SPEED,  95, 0.5);
+        driveStraight(DRIVE_SPEED, -14.75, -120);
+       turnToHeading(TURN_SPEED,  -90);
+       holdHeading(TURN_SPEED,  -90, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
-            driveStraight(DRIVE_SPEED, 30.5, 95);
+            driveStraight(DRIVE_SPEED, 30.5, -90);
             turnToHeading(TURN_SPEED,  180);
             holdHeading(TURN_SPEED,  180, 0.5);
         }
@@ -398,14 +397,16 @@ public class RightRed extends LinearOpMode {
             holdHeading(TURN_SPEED,  180, 0.5);
         }
         else {
-        driveStraight(DRIVE_SPEED, -33.5, 95);
+        driveStraight(DRIVE_SPEED, -30.5, -90);
             turnToHeading(TURN_SPEED,  180);
             holdHeading(TURN_SPEED,  180, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"
 
-        sleep(1000);  // Pause to display last telemetry message.
+        slide_motor.setPower(0.4);
+        slide_motor.setTargetPosition(-20);
+        sleep(4000);
 
     }
 
