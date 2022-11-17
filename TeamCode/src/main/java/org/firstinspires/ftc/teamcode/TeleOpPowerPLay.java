@@ -39,6 +39,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
     private Servo Back;
     private Servo Front;
     private DigitalChannel touch;
+    private DigitalChannel slide_zero;
     private double left_front_power;
     private double right_front_power;
     private double left_rear_power;
@@ -86,8 +87,13 @@ public class TeleOpPowerPLay extends LinearOpMode {
         double movementRadians = 0;
         double gamepadXControl = 0;
         double gamepadYControl = 0;
-        boolean collectionMode;
-        boolean coneReceived;
+        boolean collectionMode = false;
+        boolean coneReceived = false;
+        boolean slideHasBeenZeroed = false;
+        int coneCollectPosition = 1050;
+        int lowJunction = 1500;
+        int medJunction = 2500;
+        int highJunction = 3500;
 
         left_front = hardwareMap.get(DcMotor.class, "left_front");
         right_front = hardwareMap.get(DcMotor.class, "right_front");
@@ -97,6 +103,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
         Back = hardwareMap.get(Servo.class, "Back");
         Front = hardwareMap.get(Servo.class, "Front");
         touch = hardwareMap.get(DigitalChannel.class, "touch");
+        slide_zero = hardwareMap.get(DigitalChannel.class, "slide_zero");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -109,16 +116,28 @@ public class TeleOpPowerPLay extends LinearOpMode {
         slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide_motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slide_motor.setTargetPosition(0);
-        slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slide_motor.setPower(0.75);
-        collectionMode = false;
-        coneReceived = false;
+        slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            if (!slideHasBeenZeroed) {  //run the slide down until the slide_zero button is touched
+                if (slide_zero.getState()) { //the slide zero button is not pressed
+                    slide_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    slide_motor.setPower(-0.55);
+                }
+                else {
+                    slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    slide_motor.setTargetPosition(coneCollectPosition); //pop to the cone collection position
+                    slide_motor.setPower(0.75);
+                    slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    slideHasBeenZeroed = true;
+                }
+
+            }
 
             /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
             angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -173,38 +192,46 @@ public class TeleOpPowerPLay extends LinearOpMode {
 
             //Declare other button functions here
             //*****************************     Gamepad 1     **************************************
-            if (gamepad1.left_bumper){ //Slow down for precision
+            //**************   ROBOT SPEED   **************
+            if (gamepad1.left_bumper){ // slow down for precision
                 DRIVE_SPEED = 0.25;
             }
-            else{
+            else if (slide_motor.getCurrentPosition() > medJunction) { // slow down when slide is high
+                DRIVE_SPEED = 0.45;
+            }
+            else {
                 DRIVE_SPEED = 0.65;
             }
 
             //Spin 180 degrees
-            //if (gamepad1.right_bumper) {
-            //    float currentHeading = angles.firstAngle;
-            //    turnToHeading(TURN_SPEED, currentHeading - 180);
-          //  }
+            if (gamepad1.right_bumper) {
+                float currentHeading = angles.firstAngle;
+                float targetHeading = currentHeading + 180;
+                turnToHeading(TURN_SPEED, targetHeading);
+                sleep(500); //debounce
+            }
 
             //Reset Heading
-           while (gamepad1.right_bumper) {
+           while (gamepad2.left_bumper) {
                resetHeading();
            }
 
             //*****************************     Gamepad 2     **************************************
             //Pick up cone
             if (gamepad2.a) {
-                collectionMode = true; //waiting for cone to trigger touch sensor
-                slide_motor.setTargetPosition(100); //Drop until cone is picked up
-                Back.setPosition(0); //turn servos to intake mode
-                Front.setPosition(1);
+                if (!coneReceived) { //don't run the slide down if we possess a cone, AKA tip over
+                    collectionMode = true; //waiting for cone to trigger touch sensor
+                    slide_motor.setTargetPosition(100); //Drop until cone is picked up
+                    Back.setPosition(0); //turn servos to intake mode
+                    Front.setPosition(1);
+                }
             }
             //Cone is collected
             if (collectionMode) {
                 if (!touch.getState()) { //!touch.getState() = switch is pressed
                     collectionMode = false; //no longer in collection mode
                     coneReceived = true; //triggers the keepCone method
-                    slide_motor.setTargetPosition(1400); //pop slide to the middle position
+                    slide_motor.setTargetPosition(medJunction); //pop slide to the middle position
                 }
             }
             if (coneReceived) {
@@ -212,25 +239,40 @@ public class TeleOpPowerPLay extends LinearOpMode {
                 }
 
             if (gamepad2.b) { //drop the cone
-                coneReceived = false; //reset this variable
-                Back.setPosition(1);
-                Front.setPosition(0);
-                sleep(350); //nobody move while we drop this!
-                Back.setPosition(0.5);
-                Front.setPosition(0.5);
+                    coneReceived = false; //reset this variable
+                    Back.setPosition(1);
+                    Front.setPosition(0);
+                    sleep(350); //nobody move while we drop this!
+                    Back.setPosition(0.5);
+                    Front.setPosition(0.5);
             }
             if (gamepad2.dpad_up) {
-                slide_motor.setTargetPosition(3500); //move slide to High position
+                slide_motor.setTargetPosition(highJunction); //move slide to High position
             }
             if (gamepad2.dpad_right) {
-                slide_motor.setTargetPosition(2500); //move slide to Medium position
+                slide_motor.setTargetPosition(medJunction); //move slide to Medium position
             }
             if (gamepad2.dpad_down) {
-                slide_motor.setTargetPosition(1550); //move slide to Low position
+                slide_motor.setTargetPosition(lowJunction); //move slide to Low position
             }
             if (gamepad2.dpad_left) {
-                slide_motor.setTargetPosition(1050); //move slide to cone pickup position/Off the ground for ground junction
+                slide_motor.setTargetPosition(coneCollectPosition); //move slide to cone pickup position/Off the ground for ground junction
             }
+
+            if (gamepad2.right_bumper){ //run slide down manually
+                collectionMode = false;
+                Back.setPosition(0.5);
+                Front.setPosition(0.5);
+                slide_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                slide_motor.setPower(-0.75);
+                slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                slide_motor.setTargetPosition(0);
+            }
+            else{
+                slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide_motor.setPower(0.75);
+            }
+
             telemetry.update();
 
         } //End of while op mode is active

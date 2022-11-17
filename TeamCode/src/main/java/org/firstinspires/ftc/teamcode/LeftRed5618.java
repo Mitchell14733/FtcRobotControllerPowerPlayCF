@@ -146,8 +146,8 @@ public class LeftRed5618 extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .4;     // Max driving speed for better distance accuracy.
-    static final double     TURN_SPEED              = .4;     // Max Turn speed to limit turn rate
+    static final double     DRIVE_SPEED             = .75;     // Max driving speed for better distance accuracy.
+    static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
     // Define the Proportional control coefficient (or GAIN) for "heading control".
@@ -239,7 +239,7 @@ public class LeftRed5618 extends LinearOpMode {
         resetHeading();
 
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 2"), cameraMonitorViewId);
         aprilTagDetectionPipeline = new AprilTagDetectionPipeline(tagsize, fx, fy, cx, cy);
 
         camera.setPipeline(aprilTagDetectionPipeline);
@@ -347,21 +347,21 @@ public class LeftRed5618 extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-        slide_motor.setPower(0.75);
+        slide_motor.setPower(1);
 
         slide_motor.setTargetPosition(slideMiddlePosition);
         driveStraight(DRIVE_SPEED, 70, 0);
         driveStraight(DRIVE_SPEED, -9, 0);
         turnToHeading(TURN_SPEED,  -120.5);
-        driveStraight(DRIVE_SPEED, 12, -120.5);
+        driveStraight(DRIVE_SPEED, 14, -120.5);
         Output();
-        sleep(2000);
+        sleep(1500);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -19.5, -120.5);
+        driveStraight(DRIVE_SPEED, -16.5, -120.5);
         slide_motor.setTargetPosition(900);
         turnToHeading(TURN_SPEED,  96);
-        holdHeading(TURN_SPEED,  96, 0.5);
-        driveStraight(DRIVE_SPEED, 36, 96);
+//       holdHeading(TURN_SPEED,  96, 0.5);
+        driveStraight(.5, 36, 96);
         while (touch.getState()) {
             slide_motor.setTargetPosition(450);
             Intake();
@@ -377,19 +377,43 @@ public class LeftRed5618 extends LinearOpMode {
         sleep(750);
         driveStraight(DRIVE_SPEED, -30, 96);
         turnToHeading(TURN_SPEED,  -125);
-        holdHeading(TURN_SPEED,  -125, 0.5);
+//        holdHeading(TURN_SPEED,  -125, 0.5);
         driveStraight(DRIVE_SPEED, 16.5, -125);
         Output();
-        sleep(2000);
+        sleep(1500);
         driveStraight(DRIVE_SPEED, -14.75, -125);
-       turnToHeading(TURN_SPEED,  -90);
-       holdHeading(TURN_SPEED,  -90, 0.5);
+        slide_motor.setTargetPosition(900);
+        turnToHeading(TURN_SPEED,  96);
+//       holdHeading(TURN_SPEED,  96, 0.5);
+        driveStraight(.5, 36, 96);
+        while (touch.getState()) {
+            slide_motor.setTargetPosition(450);
+            Intake();
+            telemetry.addData("Digital Touch", "Is Not Pressed");//true
+            telemetry.update();
+        }
+        if (!touch.getState()) {
+            Back.setPosition(.5);
+            Front.setPosition(.5);
+        }
+
+        slide_motor.setTargetPosition(slideMiddlePosition);
+        sleep(750);
+        driveStraight(DRIVE_SPEED, -30, 96);
+        turnToHeading(TURN_SPEED,  -125);
+//        holdHeading(TURN_SPEED,  -125, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, -125);
+        Output();
+        sleep(1500);
+        driveStraight(DRIVE_SPEED, -14.75, -125);
+        turnToHeading(TURN_SPEED,  -90);
+//       holdHeading(TURN_SPEED,  -90, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
             driveStraight(DRIVE_SPEED, 30.5, -90);
             turnToHeading(TURN_SPEED,  180);
-            holdHeading(TURN_SPEED,  180, 0.5);
+//            holdHeading(TURN_SPEED,  180, 0.5);
         }
         else if(tagOfInterest.id == MIDDLE) {
         // Drive to middle, needed because there need to be this or it will never run middle
