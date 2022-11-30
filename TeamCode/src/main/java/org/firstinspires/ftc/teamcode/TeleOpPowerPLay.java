@@ -242,7 +242,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
                     coneReceived = false; //reset this variable
                     Back.setPosition(1);
                     Front.setPosition(0);
-                    sleep(350); //nobody move while we drop this!
+                    sleep(550); //nobody move while we drop this!
                     Back.setPosition(0.5);
                     Front.setPosition(0.5);
             }
