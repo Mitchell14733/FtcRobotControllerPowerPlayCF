@@ -353,14 +353,14 @@ public class RightRed6494 extends LinearOpMode {
         driveStraight(DRIVE_SPEED, 50, 0);
         driveStraight(.5, 20, 0);
         driveStraight(DRIVE_SPEED, -8, 0);
-        turnToHeading(TURN_SPEED,  142);
-        driveStraight(DRIVE_SPEED, 12.5, 142);
+        turnToHeading(TURN_SPEED,  135);
+        driveStraight(DRIVE_SPEED, 12.5, 135);
         Output();
 
         //Cone #2
         sleep(1500);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -12.5, 142);
+        driveStraight(DRIVE_SPEED, -12.5, 135);
         slide_motor.setTargetPosition(950);
         turnToHeading(TURN_SPEED,  -84.5);
 //        holdHeading(TURN_SPEED,  -84.5, 0.5);
@@ -379,14 +379,14 @@ public class RightRed6494 extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
         driveStraight(DRIVE_SPEED, -37, -84.5);
-        turnToHeading(TURN_SPEED,  150);
+        turnToHeading(TURN_SPEED,  146);
 //        holdHeading(TURN_SPEED,  145, 0.5);
-        driveStraight(DRIVE_SPEED, 12.5, 150);
+        driveStraight(DRIVE_SPEED, 11.5, 146);
         Output();
 
         //Cone #3
         sleep(1500);
-        driveStraight(DRIVE_SPEED, -11.5, 150);
+        driveStraight(DRIVE_SPEED, -10.5, 146);
         slide_motor.setTargetPosition(900);
         turnToHeading(TURN_SPEED,  -84.5);
 //        holdHeading(TURN_SPEED,  -84.5, 0.5);
@@ -405,12 +405,12 @@ public class RightRed6494 extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
         driveStraight(DRIVE_SPEED, -37, -84.5);
-        turnToHeading(TURN_SPEED,  150);
+        turnToHeading(TURN_SPEED,  146);
 //        holdHeading(TURN_SPEED,  145, 0.5);
-        driveStraight(DRIVE_SPEED, 12.5, 150);
+        driveStraight(DRIVE_SPEED, 11.5, 146);
         Output();
         sleep(1500);
-        driveStraight(DRIVE_SPEED, -14.75, 150);
+        driveStraight(DRIVE_SPEED, -13.75, 146);
        turnToHeading(TURN_SPEED,  95);
 //       holdHeading(TURN_SPEED,  95, 0.5);
 

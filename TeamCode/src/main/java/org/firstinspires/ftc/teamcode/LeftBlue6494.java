@@ -146,7 +146,7 @@ public class LeftBlue6494 extends LinearOpMode {
 
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
-    static final double     DRIVE_SPEED             = .5;     // Max driving speed for better distance accuracy.
+    static final double     DRIVE_SPEED             = .75;     // Max driving speed for better distance accuracy.
     static final double     TURN_SPEED              = .5;     // Max Turn speed to limit turn rate
     static final double     HEADING_THRESHOLD       = 1.0 ;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
@@ -352,13 +352,15 @@ public class LeftBlue6494 extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         driveStraight(DRIVE_SPEED, 70, 0);
         driveStraight(DRIVE_SPEED, -9, 0);
-        turnToHeading(TURN_SPEED,  -124);
-        holdHeading(TURN_SPEED,  -124, 0.5);
-        driveStraight(DRIVE_SPEED, 19, -124);
-        Output();
-        sleep(2000);
+        turnToHeading(TURN_SPEED,  -130);
+        holdHeading(TURN_SPEED,  -130, 0.5);
+        driveStraight(DRIVE_SPEED, 14, -130);
+        Output();                                           //Drop cone #1
+
+
+        sleep(1750);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -20.5, -124);
+        driveStraight(DRIVE_SPEED, -14.5, -130);
         slide_motor.setTargetPosition(900);
         turnToHeading(TURN_SPEED,  94);
         holdHeading(TURN_SPEED,  94, 0.5);
@@ -377,31 +379,59 @@ public class LeftBlue6494 extends LinearOpMode {
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
         driveStraight(DRIVE_SPEED, -30, 94);
-        turnToHeading(TURN_SPEED,  -124);
-        holdHeading(TURN_SPEED,  -124, 0.5);
-        driveStraight(DRIVE_SPEED, 12.5, -124);
-        Output();
-        sleep(2000);
-        driveStraight(DRIVE_SPEED, -16.75, -124);
-       turnToHeading(TURN_SPEED,  -90);
+        turnToHeading(TURN_SPEED,  -130);
+        holdHeading(TURN_SPEED,  -130, 0.5);
+        driveStraight(DRIVE_SPEED, 14, -130);
+        Output();                                               //drop cone #2
+
+
+        sleep(1500);
+        driveStraight(DRIVE_SPEED, -13.5, -130);
+        slide_motor.setTargetPosition(900);
+        turnToHeading(TURN_SPEED,  94);
+        holdHeading(TURN_SPEED,  94, 0.5);
+        driveStraight(DRIVE_SPEED, 36, 94);
+        while (touch.getState()) {
+            slide_motor.setTargetPosition(450);
+            Intake();
+            telemetry.addData("Digital Touch", "Is Not Pressed");//true
+            telemetry.update();
+        }
+        if (!touch.getState()) {
+            Back.setPosition(.5);
+            Front.setPosition(.5);
+        }
+        slide_motor.setTargetPosition(slideMiddlePosition);
+        sleep(750);
+        driveStraight(DRIVE_SPEED, -30, 94);
+        turnToHeading(TURN_SPEED,  -130);
+        holdHeading(TURN_SPEED,  -130, 0.5);
+        driveStraight(DRIVE_SPEED, 13.5, -130);
+        Output();                                               //drop cone #3
+
+
+        sleep(1500);
+        driveStraight(DRIVE_SPEED, -16.75, -130);
+        slide_motor.setTargetPosition(900);
+        turnToHeading(TURN_SPEED,  -90);
        holdHeading(TURN_SPEED,  -90, 0.5);
 
         if(tagOfInterest.id == LEFT) {
             //Drive to Left
             driveStraight(DRIVE_SPEED, 30.5, -90);
-            turnToHeading(TURN_SPEED,  180);
-            holdHeading(TURN_SPEED,  180, 0.5);
+            turnToHeading(TURN_SPEED,  182);
+            holdHeading(TURN_SPEED,  182, 0.5);
         }
         else if(tagOfInterest.id == MIDDLE) {
-            turnToHeading(TURN_SPEED,  180);
-            holdHeading(TURN_SPEED,  180, 0.5);
+            turnToHeading(TURN_SPEED,  182);
+            holdHeading(TURN_SPEED,  182, 0.5);
             // Drive to middle, needed because there need to be this or it will never run middle
 
         }
         else {
         driveStraight(DRIVE_SPEED, -40, -90);
-            turnToHeading(TURN_SPEED,  180);
-            holdHeading(TURN_SPEED,  180, 0.5);
+            turnToHeading(TURN_SPEED,  182);
+            holdHeading(TURN_SPEED,  182, 0.5);
         }
 
 //        driveStraight(DRIVE_SPEED, 24.0, 0.0);    // Drive Forward 24"

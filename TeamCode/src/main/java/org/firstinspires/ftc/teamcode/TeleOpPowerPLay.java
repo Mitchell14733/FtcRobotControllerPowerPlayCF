@@ -90,7 +90,7 @@ public class TeleOpPowerPLay extends LinearOpMode {
         boolean collectionMode = false;
         boolean coneReceived = false;
         boolean slideHasBeenZeroed = false;
-        int coneCollectPosition = 1050;
+        int coneCollectPosition = 1500;
         int lowJunction = 1500;
         int medJunction = 2500;
         int highJunction = 3500;
@@ -123,6 +123,8 @@ public class TeleOpPowerPLay extends LinearOpMode {
         waitForStart();
 
         // run until the end of the match (driver presses STOP)
+
+        //Auto Slide-Zero
         while (opModeIsActive()) {
             if (!slideHasBeenZeroed) {  //run the slide down until the slide_zero button is touched
                 if (slide_zero.getState()) { //the slide zero button is not pressed
@@ -246,6 +248,12 @@ public class TeleOpPowerPLay extends LinearOpMode {
                     Back.setPosition(0.5);
                     Front.setPosition(0.5);
             }
+
+            //        int coneCollectPosition   = 1050;
+            //        int lowJunction           = 1500;
+            //        int medJunction           = 2500;
+            //        int highJunction          = 3500;
+
             if (gamepad2.dpad_up) {
                 slide_motor.setTargetPosition(highJunction); //move slide to High position
             }
@@ -260,13 +268,13 @@ public class TeleOpPowerPLay extends LinearOpMode {
             }
 
             if (gamepad2.right_bumper){ //run slide down manually
-                collectionMode = false;
-                Back.setPosition(0.5);
-                Front.setPosition(0.5);
-                slide_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                slide_motor.setPower(-0.75);
-                slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                slide_motor.setTargetPosition(0);
+                slideHasBeenZeroed = false;
+//                Back.setPosition(0.5);
+//                Front.setPosition(0.5);
+//                slide_motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//                slide_motor.setPower(-0.75);
+//                slide_motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                slide_motor.setTargetPosition(0);
             }
             else{
                 slide_motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
