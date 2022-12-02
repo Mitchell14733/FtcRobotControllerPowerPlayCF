@@ -350,18 +350,23 @@ public class LeftRed5618 extends LinearOpMode {
         slide_motor.setPower(1);
 
         slide_motor.setTargetPosition(slideMiddlePosition);
-        driveStraight(DRIVE_SPEED, 70, 0);
+        driveStraight(DRIVE_SPEED, 45, 0);
+        driveStraight(.5, 25, 0);
         driveStraight(DRIVE_SPEED, -9, 0);
-        turnToHeading(TURN_SPEED,  -113.5);
-        driveStraight(DRIVE_SPEED, 16, -120.5);
+        turnToHeading(TURN_SPEED,  -130.5);
+        driveStraight(DRIVE_SPEED, 13, -130.5);
         Output();
-        sleep(1500);
+//      Cone 1
+
+
+        sleep(1750);
         ServoOff();
-        driveStraight(DRIVE_SPEED, -16.5, -120.5);
+        driveStraight(DRIVE_SPEED, -16, -130.5);
         slide_motor.setTargetPosition(900);
-        turnToHeading(TURN_SPEED,  96);
-//       holdHeading(TURN_SPEED,  96, 0.5);
-        driveStraight(.5, 36, 96);
+        turnToHeading(TURN_SPEED,  90);
+//      holdHeading(TURN_SPEED,  96, 0.5);
+        driveStraight(.5, 26.5, 90);
+        driveStraight(.25, 6, 90);
         while (touch.getState()) {
             slide_motor.setTargetPosition(450);
             Intake();
@@ -375,17 +380,21 @@ public class LeftRed5618 extends LinearOpMode {
 
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
-        driveStraight(DRIVE_SPEED, -30, 96);
-        turnToHeading(TURN_SPEED,  -125);
-//        holdHeading(TURN_SPEED,  -125, 0.5);
-        driveStraight(DRIVE_SPEED, 16.5, -125);
+        driveStraight(DRIVE_SPEED, -30, 90);
+        turnToHeading(TURN_SPEED,  -130);
+//      holdHeading(TURN_SPEED,  -125, 0.5);
+        driveStraight(DRIVE_SPEED, 16.5, -130);
         Output();
+//      Cone 2
+
+
         sleep(1500);
-        driveStraight(DRIVE_SPEED, -14.75, -125);
+        driveStraight(DRIVE_SPEED, -16.75, -130);
         slide_motor.setTargetPosition(900);
-        turnToHeading(TURN_SPEED,  96);
+        turnToHeading(TURN_SPEED,  90);
 //       holdHeading(TURN_SPEED,  96, 0.5);
-        driveStraight(.5, 36, 96);
+        driveStraight(.5, 26.5, 90);
+        driveStraight(.25, 6, 90);
         while (touch.getState()) {
             slide_motor.setTargetPosition(450);
             Intake();
@@ -399,13 +408,16 @@ public class LeftRed5618 extends LinearOpMode {
 
         slide_motor.setTargetPosition(slideMiddlePosition);
         sleep(750);
-        driveStraight(DRIVE_SPEED, -30, 96);
-        turnToHeading(TURN_SPEED,  -125);
+        driveStraight(DRIVE_SPEED, -30, 90);
+        turnToHeading(TURN_SPEED,  -130);
 //        holdHeading(TURN_SPEED,  -125, 0.5);
-        driveStraight(DRIVE_SPEED, 16.5, -125);
+        driveStraight(DRIVE_SPEED, 15.5, -130);
         Output();
         sleep(1500);
-        driveStraight(DRIVE_SPEED, -14.75, -125);
+//      Cone 3
+
+
+        driveStraight(DRIVE_SPEED, -14.75, -130);
         turnToHeading(TURN_SPEED,  -90);
 //       holdHeading(TURN_SPEED,  -90, 0.5);
 

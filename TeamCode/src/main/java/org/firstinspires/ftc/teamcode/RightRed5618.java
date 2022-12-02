@@ -356,6 +356,8 @@ public class RightRed5618 extends LinearOpMode {
         turnToHeading(TURN_SPEED,  155.5);
         driveStraight(DRIVE_SPEED, 12.5, 149.5);
         Output();
+        //cone 1
+
         sleep(1500);
         ServoOff();
         driveStraight(DRIVE_SPEED, -13.5, 149.5);
@@ -381,6 +383,8 @@ public class RightRed5618 extends LinearOpMode {
 //        holdHeading(TURN_SPEED,  145, 0.5);
         driveStraight(DRIVE_SPEED, 12.5, 150);
         Output();
+        //Cone 2
+
         sleep(1500);
         driveStraight(DRIVE_SPEED, -14.75, 150);
         slide_motor.setTargetPosition(900);
@@ -405,6 +409,8 @@ public class RightRed5618 extends LinearOpMode {
 //        holdHeading(TURN_SPEED,  145, 0.5);
         driveStraight(DRIVE_SPEED, 12.5, 150);
         Output();
+        //Cone 3
+
         sleep(1500);
         driveStraight(DRIVE_SPEED, -14.75, 150);
        turnToHeading(TURN_SPEED,  95);
